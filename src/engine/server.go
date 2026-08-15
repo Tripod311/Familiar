@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"os/exec"
+	"path/filepath"
 	"time"
 )
 
@@ -31,6 +32,7 @@ type Server struct {
 	Status            ServerStatus
 	instance          exec.Cmd
 	exitError         error
+	pollExitTimeout   time.Duration
 	pollContext       context.Context
 	pollContextCancel context.CancelFunc
 }
@@ -46,6 +48,8 @@ func (server *Server) Start(timeout time.Duration) {
 		return
 	}
 
+	server.pollExitTimeout = timeout
+
 	args := make([]string, len(server.Args))
 	for i, a := range server.Args {
 		switch a {
@@ -60,6 +64,11 @@ func (server *Server) Start(timeout time.Duration) {
 
 	server.instance = *exec.Command(server.Exec, args...)
 
+	server.instance.Stdout = os.Stdout
+	server.instance.Stderr = os.Stderr
+	server.instance.Dir = filepath.Dir(server.Exec)
+	server.instance.Env = os.Environ()
+
 	err := server.instance.Start()
 	if err != nil {
 		fmt.Printf(
@@ -72,9 +81,8 @@ func (server *Server) Start(timeout time.Duration) {
 
 	server.Status = STARTING
 
-	ctx, cancel := context.WithTimeout(
+	ctx, cancel := context.WithCancel(
 		context.Background(),
-		timeout,
 	)
 
 	server.pollContext = ctx
@@ -109,17 +117,17 @@ func (server *Server) pollHealth(ctx context.Context, cancel context.CancelFunc)
 	ticker := time.NewTicker(250 * time.Millisecond)
 	defer ticker.Stop()
 
+	timer := time.NewTimer(server.pollExitTimeout)
+
 	client := &http.Client{
 		Timeout: 1 * time.Second,
 	}
 
 	for {
 		select {
-		case <-ctx.Done():
-			if errors.Is(ctx.Err(), context.DeadlineExceeded) {
-				server.exitError = fmt.Errorf("Inference engine timeout")
-				server.instance.Process.Kill()
-			}
+		case <-timer.C:
+			server.exitError = fmt.Errorf("Inference engine timeout")
+			server.instance.Process.Kill()
 			return
 		case <-ticker.C:
 			resp, err := client.Get(url)
@@ -132,6 +140,7 @@ func (server *Server) pollHealth(ctx context.Context, cancel context.CancelFunc)
 
 			if server.Status == STARTING {
 				if resp.StatusCode == http.StatusOK {
+					timer.Stop()
 					server.started()
 				}
 			} else {

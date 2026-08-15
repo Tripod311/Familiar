@@ -81,7 +81,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	response, err := chat.Request("Hello")
+	response, err := chat.Request("Write a function in golang that accepts int and array and returns same array without that specific int")
 	if err != nil {
 		log.Fatalf("Error: %s", err)
 	} else {
