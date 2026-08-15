@@ -1,0 +1,13 @@
+{
+    "clientDir": "../client/dist",
+    "enginesDir": "../inference_engines",
+    "modelsDir": "../models",
+    "pluginsDir": "../plugins",
+    "chatsDir": "../chats",
+
+    "apiHost": "",
+    "apiPort": 8080,
+
+    "serverMinPort": 14000,
+    "serverMaxPort": 15000
+}
