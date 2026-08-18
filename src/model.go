@@ -1,15 +1,14 @@
-package engine
+package familiar
 
 import (
 	"fmt"
+	"log"
 	"time"
 )
 
 type Model struct {
-	Name        string  `json:"name"`
-	Description string  `json:"description"`
-	FileName    string  `json:"filename"`
-	Server      *Server `json:"-"`
+	Name   string
+	Server *Server `json:"-"`
 
 	IsReady chan struct{} `json:"-"`
 }
@@ -20,11 +19,11 @@ func NewModel() *Model {
 	return &result
 }
 
-func (model *Model) Start() {
+func (model *Model) Start(startTimeout uint, verbose bool) {
 	model.Server.On("Started", model.serverStarted)
 	model.Server.On("Stopped", model.serverDown)
 
-	model.Server.Start(time.Second * 30)
+	model.Server.Start(time.Second*time.Duration(startTimeout), verbose)
 }
 
 func (model *Model) Stop() {
@@ -38,6 +37,15 @@ func (model *Model) serverStarted(ev *Event) {
 }
 
 func (model *Model) serverDown(ev *Event) {
-	fmt.Printf("Model %s is down. Restarting...", model.Name)
-	model.Server.Start(time.Second * 30)
+	log.Fatal("Model %s is down.", model.Name)
+}
+
+func (model *Model) Request(req *ServerRequest) (string, error) {
+	response, err := model.Server.Request(req)
+
+	if err != nil {
+		return "", fmt.Errorf("Request failed: %s", err)
+	}
+
+	return response, nil
 }

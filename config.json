@@ -1,13 +1,23 @@
 {
-    "clientDir": "../client/dist",
-    "enginesDir": "../inference_engines",
+    "enginesDir": "../engines",
     "modelsDir": "../models",
-    "pluginsDir": "../plugins",
-    "chatsDir": "../chats",
+    "modulesDir": "../modules",
 
-    "apiHost": "",
-    "apiPort": 8080,
+    "app": {
+        "port": 14000,
+        "verbose": true,
+        "startTimeout": 60,
+        "engine": "ubuntu-vulkan-llama",
+        "model": "Qwen3-0.6B-Q8_0.gguf",
+        
+        "main": {
+            "name": "ui",
+            "configuration": {
+                "port": 8080
+            }
+        },
 
-    "serverMinPort": 14000,
-    "serverMaxPort": 15000
+        "helpers": {
+        }
+    }
 }

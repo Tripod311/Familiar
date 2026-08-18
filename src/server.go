@@ -1,4 +1,4 @@
-package engine
+package familiar
 
 import (
 	"bytes"
@@ -43,7 +43,7 @@ func NewServer() *Server {
 	return &result
 }
 
-func (server *Server) Start(timeout time.Duration) {
+func (server *Server) Start(timeout time.Duration, verbose bool) {
 	if server.Status != DOWN {
 		return
 	}
@@ -64,8 +64,11 @@ func (server *Server) Start(timeout time.Duration) {
 
 	server.instance = *exec.Command(server.Exec, args...)
 
-	server.instance.Stdout = os.Stdout
-	server.instance.Stderr = os.Stderr
+	if verbose {
+		server.instance.Stdout = os.Stdout
+		server.instance.Stderr = os.Stderr
+	}
+
 	server.instance.Dir = filepath.Dir(server.Exec)
 	server.instance.Env = os.Environ()
 
@@ -181,23 +184,9 @@ func (server *Server) handleExit() {
 	server.Status = DOWN
 }
 
-func (server *Server) Request(message string) (string, error) {
-	req := ServerRequest{}
-
-	ev := Event{
-		Command: "BeforeRequest",
-		Data:    &req,
-	}
-
-	server.Emit(ev)
-
-	req.Messages = append(req.Messages, Message{
-		Role:    RoleUser,
-		Content: message,
-	})
-
+func (server *Server) Request(req *ServerRequest) (string, error) {
 	for iteration := 0; iteration < 16; iteration++ {
-		res, err := server.complete(&req)
+		res, err := server.complete(req)
 
 		if err != nil {
 			return "", fmt.Errorf("Error: %s", err)
@@ -217,7 +206,7 @@ func (server *Server) Request(message string) (string, error) {
 				server.Emit(Event{
 					Command: "ToolCall",
 					Data: ToolCallEventData{
-						Request: &req,
+						Request: req,
 						Call:    &call,
 					},
 				})

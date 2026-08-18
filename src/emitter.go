@@ -1,4 +1,4 @@
-package engine
+package familiar
 
 type Event struct {
 	Command string
