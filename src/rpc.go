@@ -1,4 +1,4 @@
-package familiar
+package main
 
 import "encoding/json"
 

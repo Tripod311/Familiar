@@ -1,4 +1,4 @@
-package familiar
+package main
 
 type Event struct {
 	Command string
