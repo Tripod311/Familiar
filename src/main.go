@@ -15,13 +15,13 @@ type ModuleConfiguration struct {
 }
 
 type AppConfiguration struct {
-	Engine       string                `json:"engine"`
-	Model        string                `json:"model"`
-	Port         int                   `json:"port"`
-	Verbose      bool                  `json:"verbose"`
-	StartTimeout uint                  `json:"startTimeout"`
-	Main         ModuleConfiguration   `json:"main"`
-	Helpers      []ModuleConfiguration `json:"helpers"`
+	Engine       string                         `json:"engine"`
+	Model        string                         `json:"model"`
+	Port         int                            `json:"port"`
+	Verbose      bool                           `json:"verbose"`
+	StartTimeout uint                           `json:"startTimeout"`
+	Main         ModuleConfiguration            `json:"main"`
+	Helpers      map[string]ModuleConfiguration `json:"helpers"`
 }
 
 type Configuration struct {
@@ -34,7 +34,7 @@ type Configuration struct {
 type Application struct {
 	Model   *Model
 	Main    *Module
-	Helpers []*Module
+	Helpers map[string]*Module
 }
 
 func (app *Application) Cleanup() {
@@ -122,14 +122,14 @@ func main() {
 		log.Fatal(err)
 	}
 	// load helpers
-	helpers := make([]*Module, len(config.App.Helpers))
+	helpers := make(map[string]*Module)
 
-	for _, moduleConf := range config.App.Helpers {
+	for key, moduleConf := range config.App.Helpers {
 		m, err := NewModule(fmt.Sprintf("%s/%s", config.ModulesDir, moduleConf.Name))
 		if err != nil {
 			log.Fatal(err)
 		}
-		helpers = append(helpers, m)
+		helpers[key] = m
 	}
 
 	// start everything

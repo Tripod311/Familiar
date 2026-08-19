@@ -1,0 +1,22 @@
+{
+    "enginesDir": "../engines",
+    "modelsDir": "../models",
+    "modulesDir": "../modules",
+
+    "app": {
+        "port": 14000,
+        "verbose": true,
+        "startTimeout": 60,
+        "engine": "ubuntu-vulkan-llama",
+        "model": "Qwen3-0.6B-Q8_0.gguf",
+        
+        "main": {
+            "name": "ui",
+            "configuration": {
+                "port": 8080
+            }
+        },
+
+        "helpers": {}
+    }
+}

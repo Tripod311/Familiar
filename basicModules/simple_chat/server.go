@@ -1,4 +1,4 @@
-package simple_chat
+package main
 
 import (
 	"context"
