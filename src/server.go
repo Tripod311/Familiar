@@ -186,16 +186,16 @@ func (server *Server) handleExit() {
 	server.Status = DOWN
 }
 
-func (server *Server) Request(req *sdk.ServerRequest) (string, error) {
+func (server *Server) Request(req *sdk.ServerRequest) (*sdk.Message, error) {
 	for iteration := 0; iteration < 16; iteration++ {
 		res, err := server.complete(req)
 
 		if err != nil {
-			return "", fmt.Errorf("Error: %s", err)
+			return nil, fmt.Errorf("Error: %s", err)
 		}
 
 		if len(res.Choices) == 0 {
-			return "", fmt.Errorf("Error: empty response")
+			return nil, fmt.Errorf("Error: empty response")
 		}
 
 		assistant := res.Choices[0].Message
@@ -214,11 +214,11 @@ func (server *Server) Request(req *sdk.ServerRequest) (string, error) {
 				})
 			}
 		} else {
-			return assistant.Content, nil
+			return &assistant, nil
 		}
 	}
 
-	return "", fmt.Errorf("Tool loop exceeded iteration limit")
+	return nil, fmt.Errorf("Tool loop exceeded iteration limit")
 }
 
 func (server *Server) complete(req *sdk.ServerRequest) (*sdk.ServerResponse, error) {

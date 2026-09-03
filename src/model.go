@@ -38,14 +38,14 @@ func (model *Model) serverStarted(ev *sdk.Event) {
 }
 
 func (model *Model) serverDown(ev *sdk.Event) {
-	log.Fatal("Model %s is down.", model.Name)
+	log.Fatalf("Model %s is down.", model.Name)
 }
 
-func (model *Model) Request(req *sdk.ServerRequest) (string, error) {
+func (model *Model) Request(req *sdk.ServerRequest) (*sdk.Message, error) {
 	response, err := model.Server.Request(req)
 
 	if err != nil {
-		return "", fmt.Errorf("Request failed: %s", err)
+		return nil, fmt.Errorf("Request failed: %s", err)
 	}
 
 	return response, nil

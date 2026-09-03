@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"sync"
@@ -69,6 +70,45 @@ func (app *Application) ProcessMainEvent(event *sdk.Event) {
 
 	switch packet.Method {
 	case "modelRequest":
+		tools := make([]sdk.ToolDescription, 0)
+		var messages []sdk.Message
+
+		err := json.Unmarshal(packet.Params, &messages)
+		if err != nil {
+			app.Main.Respond(packet.ID, nil, &sdk.RPCError{
+				Code:    1,
+				Message: fmt.Sprintf("Packet reading error: %s", err),
+			})
+			return
+		}
+
+		req := sdk.ServerRequest{
+			Tools:    tools,
+			Messages: messages,
+		}
+
+		res, err := app.Model.Request(&req)
+		if err != nil {
+			app.Main.Respond(packet.ID, nil, &sdk.RPCError{
+				Code:    1,
+				Message: fmt.Sprintf("Packet processing error: %s", err),
+			})
+			return
+		}
+
+		bytes, err := json.Marshal(res)
+		if err != nil {
+			app.Main.Respond(packet.ID, nil, &sdk.RPCError{
+				Code:    1,
+				Message: fmt.Sprintf("Packet response error: %s", err),
+			})
+			return
+		}
+
+		err = app.Main.Respond(packet.ID, bytes, nil)
+		if err != nil {
+			fmt.Printf("Error on response: %s", err)
+		}
 	case "moduleRequest":
 	}
 }

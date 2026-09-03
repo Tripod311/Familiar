@@ -106,21 +106,40 @@ func (module *Module) Start() error {
 	module.stdout = stdout
 	module.stderr = stderr
 
-	module.connector = sdk.NewConnector(module.Name, module.stdout, module.stdin)
-	module.connector.On("packetReceived", module.processPacket)
+	module.connector = sdk.NewConnector(
+		module.Name,
+		module.stdout,
+		module.stdin,
+	)
+
+	module.connector.On(
+		"packetReceived",
+		module.processPacket,
+	)
+
+	module.connector.On(
+		"closed",
+		module.moduleDisconnected,
+	)
 
 	if err := module.instance.Start(); err != nil {
-		return fmt.Errorf("start module %s: %w", module.Name, err)
+		return fmt.Errorf(
+			"start module %s: %w",
+			module.Name,
+			err,
+		)
 	}
 
+	module.connector.Start()
+
 	go module.stderrLoop()
+
+	module.started = true
 
 	module.logger.Printf(
 		"started: %s",
 		module.Description,
 	)
-
-	module.started = true
 
 	return nil
 }
@@ -142,6 +161,7 @@ func (module *Module) Stop() {
 
 	module.connector.Stop()
 	module.instance.Process.Kill()
+	module.instance.Wait()
 }
 
 func (module *Module) Send(method string, params json.RawMessage) (*sdk.RPCPacket, error) {
@@ -154,6 +174,10 @@ func (module *Module) Send(method string, params json.RawMessage) (*sdk.RPCPacke
 	response := <-resChan
 
 	return &response, nil
+}
+
+func (module *Module) Respond(id string, result json.RawMessage, rpcError *sdk.RPCError) error {
+	return module.connector.Respond(id, result, rpcError)
 }
 
 func (module *Module) stderrLoop() {

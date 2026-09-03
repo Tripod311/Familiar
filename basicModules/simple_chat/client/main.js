@@ -16,40 +16,40 @@ function addMessage(role, content) {
     return element;
 }
 
-function popMessage() {
-    messages.lastElementChild.remove();
-}
-
 async function sendMessage(message) {
     LOCKED = true;
 
     addMessage("user", message);
-    addMessage("thinking", "Thinking...");
+    const placeholder = addMessage("thinking", "Thinking...");
 
-    const response = await fetch("/request", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            message
-        })
-    });
+    try {
+        const response = await fetch("/request", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                message
+            })
+        });
 
-    popMessage();
+        placeholder.remove();
 
-    if (!response.ok) {
+        if (!response.ok) {
+            throw new Error(`Request failed: ${response.status}\n${response.statusText}`);
+        }
+
+        const data = await response.json();
+
+        addMessage("assistant", data.message);
+    } catch (err) {
+        placeholder.remove();
+
         addMessage(
             "error",
-            `Error: ${response.status}`
+            `Error: ${err}`
         );
-
-        return;
     }
-
-    const data = await response.json();
-
-    addMessage("assistant", data.message);
 }
 
 form.addEventListener("submit", event => {
