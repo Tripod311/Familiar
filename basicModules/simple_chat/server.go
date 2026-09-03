@@ -4,10 +4,14 @@ import (
 	"context"
 	"embed"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/fs"
+	"net"
 	"net/http"
+	"os"
 	"path"
+	"time"
 )
 
 //go:embed client
@@ -18,6 +22,7 @@ type SPAServer struct {
 }
 
 func (spa *SPAServer) Serve(w http.ResponseWriter, r *http.Request) {
+	fileServer := http.FileServer(spa.rootDir)
 	p := path.Clean(r.URL.Path)
 
 	f, err := spa.rootDir.Open(p)
@@ -26,13 +31,16 @@ func (spa *SPAServer) Serve(w http.ResponseWriter, r *http.Request) {
 		f.Close()
 
 		if statErr == nil && !info.IsDir() {
-			http.FileServer(spa.rootDir).ServeHTTP(w, r)
+			fileServer.ServeHTTP(w, r)
 			return
 		}
 	}
 
-	r.URL.Path = "/index.html"
-	http.FileServer(spa.rootDir).ServeHTTP(w, r)
+	fallbackRequest := r.Clone(r.Context())
+	fallbackRequest.URL.Path = "/"
+	fallbackRequest.URL.RawPath = ""
+
+	fileServer.ServeHTTP(w, fallbackRequest)
 }
 
 type Server struct {
@@ -43,10 +51,10 @@ type Server struct {
 	cancel    context.CancelFunc
 	instance  *http.Server
 
-	sendRequest func(string)
+	sendRequest func(string) (string, error)
 }
 
-func Build(loadPacket json.RawMessage, sendRequest func(string)) *Server {
+func NewServer(loadPacket json.RawMessage, sendRequest func(string) (string, error)) *Server {
 	var result Server
 	json.Unmarshal(loadPacket, &result)
 
@@ -66,42 +74,98 @@ func Build(loadPacket json.RawMessage, sendRequest func(string)) *Server {
 	return &result
 }
 
-func (server *Server) Start() {
+func (server *Server) Start() error {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/", server.statics.Serve)
 	mux.HandleFunc("/request", server.HandleRequest)
+	mux.HandleFunc("/", server.statics.Serve)
 
-	server.context, server.cancel = context.WithCancel(
-		context.Background(),
-	)
+	addr := fmt.Sprintf("0.0.0.0:%d", server.Port)
+
+	listener, err := net.Listen("tcp4", addr)
+	if err != nil {
+		return fmt.Errorf("listen on %s: %w", addr, err)
+	}
+
+	if tcpAddr, ok := listener.Addr().(*net.TCPAddr); ok {
+		server.Port = tcpAddr.Port
+	}
+
 	server.instance = &http.Server{
-		Addr:    "0.0.0.0:" + fmt.Sprint(server.Port),
+		Addr:    listener.Addr().String(),
 		Handler: mux,
 	}
 
-	server.serve()
-}
+	fmt.Fprintf(
+		os.Stderr,
+		"server started: http://127.0.0.1:%d (listening on %s)\n",
+		server.Port,
+		listener.Addr(),
+	)
 
-func (server *Server) serve() {
 	go func() {
-		if err := server.instance.ListenAndServe(); err != nil {
-			// shutdown immediately
+		err := server.instance.Serve(listener)
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
+			fmt.Fprintln(os.Stderr, "server error:", err)
 		}
 	}()
 
-	<-server.context.Done()
-
-	if err := server.instance.Shutdown(server.context); err != nil {
-		// log error
-	}
+	return nil
 }
 
-func (server *Server) Stop() {
-	server.cancel()
+func (server *Server) Stop() error {
+	if server.instance == nil {
+		return nil
+	}
+
+	ctx, cancel := context.WithTimeout(
+		context.Background(),
+		5*time.Second,
+	)
+	defer cancel()
+
+	return server.instance.Shutdown(ctx)
 }
 
 // API handlers
 func (server *Server) HandleRequest(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
 
+	var body struct {
+		Message string `json:"message"`
+	}
+
+	decoder := json.NewDecoder(r.Body)
+
+	if err := decoder.Decode(&body); err != nil {
+		http.Error(w, "invalid JSON body", http.StatusBadRequest)
+		return
+	}
+
+	if body.Message == "" {
+		http.Error(w, `field "message" is required`, http.StatusBadRequest)
+		return
+	}
+
+	res, err := server.sendRequest(body.Message)
+	if err != nil {
+		http.Error(
+			w,
+			err.Error(),
+			http.StatusInternalServerError,
+		)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	if err := json.NewEncoder(w).Encode(map[string]string{
+		"message": res,
+	}); err != nil {
+		fmt.Fprintln(os.Stderr, "response encode error:", err)
+	}
 }

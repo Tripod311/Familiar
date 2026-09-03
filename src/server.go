@@ -6,11 +6,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"time"
+	sdk "tripod311/familiar-sdk"
 )
 
 type ServerStatus int
@@ -22,7 +24,7 @@ const (
 )
 
 type Server struct {
-	Emitter
+	sdk.Emitter
 	Name              string   `json:"name"`
 	Description       string   `json:"description"`
 	Exec              string   `json:"exec"`
@@ -39,7 +41,7 @@ type Server struct {
 
 func NewServer() *Server {
 	result := Server{}
-	result.Listeners = make(map[string]map[uint64]func(*Event))
+	result.Listeners = make(map[string]map[uint64]func(*sdk.Event))
 	return &result
 }
 
@@ -74,7 +76,7 @@ func (server *Server) Start(timeout time.Duration, verbose bool) {
 
 	err := server.instance.Start()
 	if err != nil {
-		fmt.Printf(
+		log.Fatalf(
 			"Error on starting %s inference engine: %s\n",
 			server.Name,
 			err,
@@ -106,7 +108,7 @@ func (server *Server) Stop() {
 
 	server.exitError = nil
 	server.Status = DOWN
-	ev := Event{
+	ev := sdk.Event{
 		Command: "Stopped",
 		Data:    nil,
 	}
@@ -157,7 +159,7 @@ func (server *Server) pollHealth(ctx context.Context, cancel context.CancelFunc)
 
 func (server *Server) started() {
 	server.Status = READY
-	ev := Event{
+	ev := sdk.Event{
 		Command: "Started",
 		Data:    nil,
 	}
@@ -166,7 +168,7 @@ func (server *Server) started() {
 
 func (server *Server) stopped() {
 	server.exitError = fmt.Errorf("Inference engine health poll timeout")
-	ev := Event{
+	ev := sdk.Event{
 		Command: "Stopped",
 		Data:    nil,
 	}
@@ -184,7 +186,7 @@ func (server *Server) handleExit() {
 	server.Status = DOWN
 }
 
-func (server *Server) Request(req *ServerRequest) (string, error) {
+func (server *Server) Request(req *sdk.ServerRequest) (string, error) {
 	for iteration := 0; iteration < 16; iteration++ {
 		res, err := server.complete(req)
 
@@ -203,9 +205,9 @@ func (server *Server) Request(req *ServerRequest) (string, error) {
 		if len(assistant.ToolCalls) > 0 {
 			// process tool calls
 			for _, call := range assistant.ToolCalls {
-				server.Emit(Event{
+				server.Emit(sdk.Event{
 					Command: "ToolCall",
-					Data: ToolCallEventData{
+					Data: sdk.ToolCallEventData{
 						Request: req,
 						Call:    &call,
 					},
@@ -219,7 +221,7 @@ func (server *Server) Request(req *ServerRequest) (string, error) {
 	return "", fmt.Errorf("Tool loop exceeded iteration limit")
 }
 
-func (server *Server) complete(req *ServerRequest) (*ServerResponse, error) {
+func (server *Server) complete(req *sdk.ServerRequest) (*sdk.ServerResponse, error) {
 	data, err := json.Marshal(req)
 	if err != nil {
 		return nil, err
@@ -246,13 +248,13 @@ func (server *Server) complete(req *ServerRequest) (*ServerResponse, error) {
 		body, _ := io.ReadAll(resp.Body)
 
 		return nil, fmt.Errorf(
-			"llama-server returned %d: %s",
+			"inference engine returned %d: %s",
 			resp.StatusCode,
 			string(body),
 		)
 	}
 
-	var result ServerResponse
+	var result sdk.ServerResponse
 
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
 		return nil, err

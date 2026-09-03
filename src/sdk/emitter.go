@@ -1,4 +1,4 @@
-package main
+package sdk
 
 type Event struct {
 	Command string

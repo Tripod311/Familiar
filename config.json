@@ -1,7 +1,7 @@
 {
-    "enginesDir": "../engines",
-    "modelsDir": "../models",
-    "modulesDir": "../modules",
+    "enginesDir": "./engines",
+    "modelsDir": "./models",
+    "modulesDir": "./modules",
 
     "app": {
         "port": 14000,

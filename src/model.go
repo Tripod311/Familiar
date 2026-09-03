@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"time"
+	sdk "tripod311/familiar-sdk"
 )
 
 type Model struct {
@@ -31,16 +32,16 @@ func (model *Model) Stop() {
 	model.Server.Stop()
 }
 
-func (model *Model) serverStarted(ev *Event) {
+func (model *Model) serverStarted(ev *sdk.Event) {
 	fmt.Printf("Model %s has started", model.Name)
 	close(model.IsReady)
 }
 
-func (model *Model) serverDown(ev *Event) {
+func (model *Model) serverDown(ev *sdk.Event) {
 	log.Fatal("Model %s is down.", model.Name)
 }
 
-func (model *Model) Request(req *ServerRequest) (string, error) {
+func (model *Model) Request(req *sdk.ServerRequest) (string, error) {
 	response, err := model.Server.Request(req)
 
 	if err != nil {

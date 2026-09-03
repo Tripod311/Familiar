@@ -2,6 +2,8 @@ const form = document.querySelector("#chatForm");
 const input = document.querySelector("#input");
 const messages = document.querySelector("#messages");
 
+let LOCKED = false;
+
 function addMessage(role, content) {
     const element = document.createElement("div");
 
@@ -14,8 +16,15 @@ function addMessage(role, content) {
     return element;
 }
 
+function popMessage() {
+    messages.lastElementChild.remove();
+}
+
 async function sendMessage(message) {
+    LOCKED = true;
+
     addMessage("user", message);
+    addMessage("thinking", "Thinking...");
 
     const response = await fetch("/request", {
         method: "POST",
@@ -27,9 +36,11 @@ async function sendMessage(message) {
         })
     });
 
+    popMessage();
+
     if (!response.ok) {
         addMessage(
-            "assistant",
+            "error",
             `Error: ${response.status}`
         );
 
@@ -42,6 +53,8 @@ async function sendMessage(message) {
 }
 
 form.addEventListener("submit", event => {
+    if (LOCKED) return;
+
     event.preventDefault();
 
     const message = input.value.trim();

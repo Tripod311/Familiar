@@ -1,4 +1,4 @@
-package main
+package sdk
 
 import "encoding/json"
 
@@ -11,9 +11,16 @@ const (
 	RoleTool      Role = "tool"
 )
 
+type Resource struct {
+	ID       string `json:"id"`
+	Name     string `json:"name,omitempty"`
+	MIMEType string `json:"mime_type"`
+}
+
 type Message struct {
 	Role       Role       `json:"role"`
 	Content    string     `json:"content,omitempty"`
+	Resources  []Resource `json:"resources,omitempty"`
 	ToolCalls  []ToolCall `json:"tool_calls,omitempty"`
 	ToolCallID string     `json:"tool_call_id,omitempty"`
 }

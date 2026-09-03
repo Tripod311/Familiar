@@ -6,70 +6,19 @@ import (
 	"io"
 	"log"
 	"os"
+	"os/signal"
 	"path/filepath"
+	"syscall"
 )
 
-type ModuleConfiguration struct {
-	Name          string          `json:"name"`
-	Configuration json.RawMessage `json:"configuration"`
-}
-
-type AppConfiguration struct {
-	Engine       string                         `json:"engine"`
-	Model        string                         `json:"model"`
-	Port         int                            `json:"port"`
-	Verbose      bool                           `json:"verbose"`
-	StartTimeout uint                           `json:"startTimeout"`
-	Main         ModuleConfiguration            `json:"main"`
-	Helpers      map[string]ModuleConfiguration `json:"helpers"`
-}
-
-type Configuration struct {
-	EnginesDir string           `json:"enginesDir"`
-	ModelsDir  string           `json:"modelsDir"`
-	ModulesDir string           `json:"modulesDir"`
-	App        AppConfiguration `json:"app"`
-}
-
-type Application struct {
-	Model   *Model
-	Main    *Module
-	Helpers map[string]*Module
-}
-
-func (app *Application) Cleanup() {
-	for _, m := range app.Helpers {
-		m.Stop()
-	}
-
-	app.Main.Stop()
-
-	app.Model.Stop()
-}
-
-func parseConfig() Configuration {
-	file, err := os.Open("./config.json")
-	if err != nil {
-		log.Fatal("configuration.json not found")
-	}
-
-	byteValue, err := io.ReadAll(file)
-	if err != nil {
-		log.Fatal("Can't read configuration file")
-	}
-
-	var result Configuration
-
-	err = json.Unmarshal(byteValue, &result)
-	if err != nil {
-		log.Fatal("Corrupted configuration file")
-	}
-
-	return result
-}
-
 func LoadModel(config Configuration) (*Model, error) {
-	file, err := os.Open(fmt.Sprintf("%s/%s/manifest.json", config.EnginesDir, config.App.Engine))
+	path := fmt.Sprintf("%s/%s/manifest.json", config.EnginesDir, config.App.Engine)
+	absPath, err := filepath.Abs(path)
+	if err != nil {
+		return nil, fmt.Errorf("filepath.Abs %s: %s", config.App.Engine, err)
+	}
+
+	file, err := os.Open(absPath)
 	if err != nil {
 		return nil, fmt.Errorf("Can't find inference engine %s: %s", config.App.Engine, err)
 	}
@@ -86,7 +35,12 @@ func LoadModel(config Configuration) (*Model, error) {
 	}
 
 	srv.Port = config.App.Port
-	srv.Exec = fmt.Sprintf("%s/%s/%s", config.EnginesDir, config.App.Engine, srv.Exec)
+	path = fmt.Sprintf("%s/%s/%s", config.EnginesDir, config.App.Engine, srv.Exec)
+	absPath, err = filepath.Abs(path)
+	if err != nil {
+		return nil, fmt.Errorf("filepath.Abs %s: %s", config.App.Engine, err)
+	}
+	srv.Exec = absPath
 
 	modelPath, err := filepath.Abs(fmt.Sprintf("%s/%s", config.ModelsDir, config.App.Model))
 	if err != nil {
@@ -104,86 +58,153 @@ func LoadModel(config Configuration) (*Model, error) {
 	return model, nil
 }
 
-func main() {
-	var app Application
+func run() error {
+	app := NewApplication()
 
-	signals := make(chan os.Signal, 1)
-
-	// create model
 	config := parseConfig()
+
 	model, err := LoadModel(config)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
-	// load main module
-	mainModule, err := NewModule(fmt.Sprintf("%s/%s", config.ModulesDir, config.App.Main.Name))
+	mainModule, err := NewModule(
+		filepath.Join(
+			config.ModulesDir,
+			config.App.Main.Name,
+		),
+	)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
-	// load helpers
+
 	helpers := make(map[string]*Module)
 
 	for key, moduleConf := range config.App.Helpers {
-		m, err := NewModule(fmt.Sprintf("%s/%s", config.ModulesDir, moduleConf.Name))
+		module, err := NewModule(
+			filepath.Join(
+				config.ModulesDir,
+				moduleConf.Name,
+			),
+		)
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
-		helpers[key] = m
+
+		helpers[key] = module
 	}
 
-	// start everything
 	app.Model = model
 	app.Main = mainModule
 	app.Helpers = helpers
+
 	defer app.Cleanup()
 
-	app.Model.Start(60, true)
-	err = app.Main.Start()
-	if err != nil {
-		log.Fatalf("Module (%s) failed to start: %s", app.Main.Name, err)
+	app.Main.On("packetReceived", app.ProcessMainEvent)
+	app.Main.On("closed", app.ProcessModuleClosed)
+
+	for _, module := range app.Helpers {
+		module.On("closed", app.ProcessModuleClosed)
 	}
-	app.Main.Send("load", config.App.Main.Configuration)
-	response := <-app.Main.RPCChan
-	if response.Error != nil {
-		log.Fatalf("Module (%s) failed to load: %s", app.Main.Name, response.Error.Message)
+
+	app.Model.Start(config.App.StartTimeout, config.App.Verbose)
+
+	if err := app.Main.Start(); err != nil {
+		return fmt.Errorf(
+			"module %s failed to start: %w",
+			app.Main.Name,
+			err,
+		)
 	}
-	for index, h := range app.Helpers {
-		err = h.Start()
+
+	for key, module := range app.Helpers {
+		if err := module.Start(); err != nil {
+			return fmt.Errorf(
+				"helper %s (%s) failed to start: %w",
+				key,
+				module.Name,
+				err,
+			)
+		}
+	}
+
+	for key, moduleConf := range config.App.Helpers {
+		response, err := app.Helpers[key].Send(
+			"load",
+			moduleConf.Configuration,
+		)
 		if err != nil {
-			log.Fatalf("Helper (%s) failed to start: %s", h.Name, err)
+			return fmt.Errorf(
+				"helper %s (%s) failed to load: %w",
+				key,
+				moduleConf.Name,
+				err,
+			)
 		}
-		h.Send("load", config.App.Helpers[index].Configuration)
-		response := <-h.RPCChan
+
 		if response.Error != nil {
-			log.Fatalf("Helper (%s) failed to load: %s", h.Name, response.Error.Message)
+			return fmt.Errorf(
+				"helper %s (%s) failed to load: (%d) %s",
+				key,
+				moduleConf.Name,
+				response.Error.Code,
+				response.Error.Message,
+			)
 		}
 	}
 
-	fmt.Println("Running")
-
-mainLoop:
-	for {
-		select {
-		case sig := <-signals:
-			fmt.Printf("Received %s", sig)
-			break mainLoop
-		case req := <-app.Main.RPCChan:
-			err := app.ProcessRequest(req)
-			if err != nil {
-
-			}
-		}
+	response, err := app.Main.Send(
+		"load",
+		config.App.Main.Configuration,
+	)
+	if err != nil {
+		return fmt.Errorf(
+			"module %s failed to load: %w",
+			app.Main.Name,
+			err,
+		)
 	}
-}
 
-func (app *Application) ProcessRequest(rpc RPCPacket) error {
-	switch rpc.Method {
-	case "log":
-		fmt.Println(string(rpc.Params))
-	case "useHelper":
-	case "useModel":
+	if response.Error != nil {
+		return fmt.Errorf(
+			"module %s failed to load: (%d) %s",
+			app.Main.Name,
+			response.Error.Code,
+			response.Error.Message,
+		)
+	}
+
+	signals := make(chan os.Signal, 1)
+
+	signal.Notify(
+		signals,
+		os.Interrupt,
+		syscall.SIGTERM,
+	)
+	defer signal.Stop(signals)
+
+	fmt.Fprintln(os.Stderr, "Familiar started")
+
+	select {
+	case receivedSignal := <-signals:
+		fmt.Fprintf(
+			os.Stderr,
+			"Received signal %s\n",
+			receivedSignal,
+		)
+
+		app.Stop()
+
+	case <-app.done:
+		// Some module crashed
 	}
 
 	return nil
+}
+
+func main() {
+	if err := run(); err != nil {
+		log.Print(err)
+		os.Exit(1)
+	}
 }
