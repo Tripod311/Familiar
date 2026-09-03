@@ -11,34 +11,35 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+
+	sdk "tripod311/familiar-sdk"
 )
 
-var connector *RPCConnector
-var hostConnector *RPCConnector
+var module *sdk.ExternalModule
+var hostConnector *sdk.RPCConnector
 var server *Server
 
 func main() {
 	moduleStream, hostStream := net.Pipe()
 
-	// Сторона тестируемого UI-модуля.
-	connector = NewConnector(
-		"simple_chat",
+	module = sdk.NewExternalModuleWithIO(
 		moduleStream,
 		moduleStream,
 	)
 
-	hostConnector = NewConnector(
+	module.LoadHandle = Setup
+	module.UnloadHandle = Shutdown
+
+	hostConnector = sdk.NewConnector(
 		"debug_host",
 		hostStream,
 		hostStream,
 	)
 
-	connector.On("packetReceived", ProcessPacket)
-
 	hostConnector.On("packetReceived", ProcessHostPacket)
-
-	connector.Start()
 	hostConnector.Start()
+
+	go module.Start()
 
 	if err := LoadDebugModule(); err != nil {
 		fmt.Fprintln(os.Stderr, "debug load failed:", err)
@@ -52,7 +53,6 @@ func main() {
 	)
 
 	signals := make(chan os.Signal, 1)
-
 	signal.Notify(
 		signals,
 		os.Interrupt,
@@ -71,80 +71,53 @@ func main() {
 	ShutdownDebug()
 }
 
-func ProcessPacket(event *Event) {
-	packet := event.Data.(RPCPacket)
+func Setup(params json.RawMessage) (json.RawMessage, error) {
+	server = NewServer(params, SendRequest)
 
-	fmt.Fprint(os.Stderr, "PACKET RECV")
-
-	switch packet.Method {
-	case "load":
-		server = NewServer(packet.Params, SendRequest)
-
-		if err := server.Start(); err != nil {
-			connector.Respond(packet.ID, nil, &RPCError{
-				Code:    -32000,
-				Message: err.Error(),
-			})
-			return
-		}
-
-		connector.Respond(packet.ID, nil, nil)
-	case "unload":
-		if server != nil {
-			server.Stop()
-		}
-		connector.Respond(packet.ID, nil, nil)
-	default:
-		fmt.Fprintf(os.Stderr, "Unknown RPC method: %s", packet.Method)
-		connector.Respond(packet.ID, nil, &RPCError{
-			Code:    1,
-			Message: fmt.Sprintf("Unknown RPC method: %s", packet.Method),
-		})
+	if err := server.Start(); err != nil {
+		return nil, fmt.Errorf("server start error: %w", err)
 	}
+
+	return nil, nil
+}
+
+func Shutdown(params json.RawMessage) (json.RawMessage, error) {
+	fmt.Fprintln(os.Stderr, "UI stopped")
+
+	if server != nil {
+		if err := server.Stop(); err != nil {
+			return nil, fmt.Errorf("server stop error: %w", err)
+		}
+	}
+
+	return nil, nil
 }
 
 func SendRequest(message string) (string, error) {
-	req := []Message{
+	request := []sdk.Message{
 		{
-			Role:    RoleUser,
+			Role:    sdk.RoleUser,
 			Content: message,
 		},
 	}
 
-	data, err := json.Marshal(req)
+	data, err := json.Marshal(request)
 	if err != nil {
 		return "", fmt.Errorf("marshal model request: %w", err)
 	}
 
-	resChan, err := connector.Send("modelRequest", data)
+	response, err := module.Send("modelRequest", data)
 	if err != nil {
 		return "", fmt.Errorf("send model request: %w", err)
 	}
 
-	response, ok := <-resChan
-	if !ok {
-		return "", errors.New(
-			"RPC connector closed before receiving model response",
-		)
+	var responseMessage sdk.Message
+
+	if err := json.Unmarshal(response, &responseMessage); err != nil {
+		return "", fmt.Errorf("decode model response: %w", err)
 	}
 
-	if response.Error != nil {
-		return "", fmt.Errorf(
-			"model request failed (%d): %s",
-			response.Error.Code,
-			response.Error.Message,
-		)
-	}
-
-	result, ok := response.Result.(string)
-	if !ok {
-		return "", fmt.Errorf(
-			"unexpected model response type: %T",
-			response.Result,
-		)
-	}
-
-	return result, nil
+	return responseMessage.Content, nil
 }
 
 func LoadDebugModule() error {
@@ -173,8 +146,8 @@ func LoadDebugModule() error {
 	return nil
 }
 
-func ProcessHostPacket(event *Event) {
-	packet, ok := event.Data.(RPCPacket)
+func ProcessHostPacket(event *sdk.Event) {
+	packet, ok := event.Data.(sdk.RPCPacket)
 	if !ok {
 		fmt.Fprintf(
 			os.Stderr,
@@ -186,43 +159,19 @@ func ProcessHostPacket(event *Event) {
 
 	switch packet.Method {
 	case "modelRequest":
-		var messages []Message
-
-		if err := json.Unmarshal(packet.Params, &messages); err != nil {
-			hostConnector.Respond(
-				packet.ID,
-				nil,
-				&RPCError{
-					Code:    -32602,
-					Message: "invalid model request",
-				},
-			)
-			return
-		}
-
-		fmt.Fprintf(
-			os.Stderr,
-			"MODEL REQUEST: %+v\n",
-			messages,
-		)
-
-		hostConnector.Respond(
-			packet.ID,
-			"This is a mock model response.",
-			nil,
-		)
+		ProcessModelRequest(packet)
 
 	default:
 		fmt.Fprintf(
 			os.Stderr,
-			"UNKNOWN MODULE REQUEST: %s\n",
+			"unknown module request: %s\n",
 			packet.Method,
 		)
 
 		hostConnector.Respond(
 			packet.ID,
 			nil,
-			&RPCError{
+			&sdk.RPCError{
 				Code:    -32601,
 				Message: "method not found",
 			},
@@ -230,11 +179,52 @@ func ProcessHostPacket(event *Event) {
 	}
 }
 
-func UnloadDebugModule() error {
-	responseChan, err := hostConnector.Send(
-		"unload",
+func ProcessModelRequest(packet sdk.RPCPacket) {
+	var messages []sdk.Message
+
+	if err := json.Unmarshal(packet.Params, &messages); err != nil {
+		hostConnector.Respond(
+			packet.ID,
+			nil,
+			&sdk.RPCError{
+				Code:    -32602,
+				Message: "invalid model request",
+			},
+		)
+		return
+	}
+
+	fmt.Fprintf(
+		os.Stderr,
+		"MODEL REQUEST: %+v\n",
+		messages,
+	)
+
+	mockResponse, err := json.Marshal(sdk.Message{
+		Role:    sdk.RoleAssistant,
+		Content: "This is a mock model response.",
+	})
+	if err != nil {
+		hostConnector.Respond(
+			packet.ID,
+			nil,
+			&sdk.RPCError{
+				Code:    -32603,
+				Message: err.Error(),
+			},
+		)
+		return
+	}
+
+	hostConnector.Respond(
+		packet.ID,
+		json.RawMessage(mockResponse),
 		nil,
 	)
+}
+
+func UnloadDebugModule() error {
+	responseChan, err := hostConnector.Send("unload", nil)
 	if err != nil {
 		return fmt.Errorf("send unload: %w", err)
 	}
@@ -256,16 +246,16 @@ func UnloadDebugModule() error {
 }
 
 func WaitResponse(
-	responseChan <-chan RPCPacket,
+	responseChan <-chan sdk.RPCPacket,
 	timeout time.Duration,
-) (RPCPacket, error) {
+) (sdk.RPCPacket, error) {
 	timer := time.NewTimer(timeout)
 	defer timer.Stop()
 
 	select {
 	case response, ok := <-responseChan:
 		if !ok {
-			return RPCPacket{}, errors.New(
+			return sdk.RPCPacket{}, errors.New(
 				"connector closed before response",
 			)
 		}
@@ -273,15 +263,15 @@ func WaitResponse(
 		return response, nil
 
 	case <-timer.C:
-		return RPCPacket{}, errors.New(
+		return sdk.RPCPacket{}, errors.New(
 			"RPC response timeout",
 		)
 	}
 }
 
 func ShutdownDebug() {
-	if connector != nil {
-		connector.Stop()
+	if module != nil {
+		module.Stop()
 	}
 
 	if hostConnector != nil {

@@ -13,7 +13,7 @@ type RPCPacket struct {
 	ID      string          `json:"id,omitempty"`
 	Method  string          `json:"method,omitempty"`
 	Params  json.RawMessage `json:"params,omitempty"`
-	Result  any             `json:"result,omitempty"`
+	Result  json.RawMessage `json:"result,omitempty"`
 	Error   *RPCError       `json:"error,omitempty"`
 }
 
@@ -115,7 +115,7 @@ func (connector *RPCConnector) Send(method string, params json.RawMessage) (chan
 
 func (connector *RPCConnector) Respond(
 	id string,
-	result any,
+	result json.RawMessage,
 	rpcError *RPCError,
 ) error {
 	connector.writeMu.Lock()

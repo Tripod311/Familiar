@@ -4,66 +4,40 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"os"
 	sdk "tripod311/familiar-sdk"
 )
 
-var connector *sdk.RPCConnector
+var module *sdk.ExternalModule
 var server *Server
 
 func main() {
-	connector = sdk.NewConnector(
-		"simple_chat",
-		os.Stdin,
-		os.Stdout,
-	)
+	module = sdk.NewExternalModule()
 
-	connector.On("packetReceived", ProcessPacket)
-	connector.On("closed", Shutdown)
+	module.LoadHandle = Setup
+	module.UnloadHandle = Shutdown
 
-	connector.Start()
-	connector.Wait()
+	module.Start()
 }
 
-func Shutdown(event *sdk.Event) {
+func Shutdown(params json.RawMessage) (json.RawMessage, error) {
 	fmt.Fprintf(os.Stderr, "UI stopped")
 	if server != nil {
 		server.Stop()
 	}
+
+	return nil, nil
 }
 
-func ProcessPacket(event *sdk.Event) {
-	packet := event.Data.(sdk.RPCPacket)
+func Setup(params json.RawMessage) (json.RawMessage, error) {
+	server = NewServer(params, SendRequest)
 
-	fmt.Fprint(os.Stderr, "PACKET RECV")
-
-	switch packet.Method {
-	case "load":
-		server = NewServer(packet.Params, SendRequest)
-
-		if err := server.Start(); err != nil {
-			connector.Respond(packet.ID, nil, &sdk.RPCError{
-				Code:    -32000,
-				Message: err.Error(),
-			})
-			return
-		}
-
-		connector.Respond(packet.ID, nil, nil)
-	case "unload":
-		if server != nil {
-			server.Stop()
-		}
-		connector.Respond(packet.ID, nil, nil)
-	default:
-		fmt.Fprintf(os.Stderr, "Unknown RPC method: %s", packet.Method)
-		connector.Respond(packet.ID, nil, &sdk.RPCError{
-			Code:    1,
-			Message: fmt.Sprintf("Unknown RPC method: %s", packet.Method),
-		})
+	if err := server.Start(); err != nil {
+		return nil, fmt.Errorf("Server start error: %s", err)
 	}
+
+	return nil, nil
 }
 
 func SendRequest(message string) (string, error) {
@@ -79,33 +53,17 @@ func SendRequest(message string) (string, error) {
 		return "", fmt.Errorf("marshal model request: %w", err)
 	}
 
-	resChan, err := connector.Send("modelRequest", data)
+	response, err := module.Send("modelRequest", data)
 	if err != nil {
-		return "", fmt.Errorf("send model request: %w", err)
+		return "", err
 	}
 
-	response, ok := <-resChan
-	if !ok {
-		return "", errors.New(
-			"RPC connector closed before receiving model response",
-		)
+	var resMsg sdk.Message
+
+	err = json.Unmarshal(response, &resMsg)
+	if err != nil {
+		return "", err
 	}
 
-	if response.Error != nil {
-		return "", fmt.Errorf(
-			"model request failed (%d): %s",
-			response.Error.Code,
-			response.Error.Message,
-		)
-	}
-
-	result, ok := response.Result.(string)
-	if !ok {
-		return "", fmt.Errorf(
-			"unexpected model response type: %T",
-			response.Result,
-		)
-	}
-
-	return result, nil
+	return resMsg.Content, nil
 }
