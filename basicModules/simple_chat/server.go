@@ -44,8 +44,8 @@ func (spa *SPAServer) Serve(w http.ResponseWriter, r *http.Request) {
 }
 
 type Server struct {
-	Port      int    `json:"port"`
-	ClientDir string `json:"clientDir"`
+	Port      int
+	ClientDir string
 	statics   *SPAServer
 	context   context.Context
 	cancel    context.CancelFunc
@@ -54,11 +54,13 @@ type Server struct {
 	sendRequest func(string) (string, error)
 }
 
-func NewServer(loadPacket json.RawMessage, sendRequest func(string) (string, error)) *Server {
+func NewServer(port int, clientDir string, sendRequest func(string) (string, error)) *Server {
 	var result Server
-	json.Unmarshal(loadPacket, &result)
 
-	if len(result.ClientDir) > 0 {
+	result.Port = port
+	result.ClientDir = clientDir
+
+	if len(clientDir) > 0 {
 		result.statics = &SPAServer{
 			rootDir: http.Dir(result.ClientDir),
 		}

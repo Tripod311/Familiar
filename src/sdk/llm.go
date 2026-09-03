@@ -75,3 +75,11 @@ type ToolCallEventData struct {
 	Request *ServerRequest
 	Call    *ToolCall
 }
+
+// module request
+
+type ModuleRequest struct {
+	Module string          `json:"module"`
+	Method string          `json:"method"`
+	Params json.RawMessage `json:"params,omitempty"`
+}

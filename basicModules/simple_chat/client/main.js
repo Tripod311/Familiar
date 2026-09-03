@@ -49,13 +49,15 @@ async function sendMessage(message) {
             "error",
             `Error: ${err}`
         );
+    } finally {
+        LOCKED = false;
     }
 }
 
 form.addEventListener("submit", event => {
-    if (LOCKED) return;
-
     event.preventDefault();
+
+    if (LOCKED) return;
 
     const message = input.value.trim();
 

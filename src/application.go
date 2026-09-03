@@ -48,17 +48,6 @@ func (app *Application) Cleanup() {
 	})
 }
 
-func (app *Application) ProcessRequest(rpc sdk.RPCPacket) error {
-	switch rpc.Method {
-	case "log":
-		fmt.Println(string(rpc.Params))
-	case "useHelper":
-	case "useModel":
-	}
-
-	return nil
-}
-
 func (app *Application) Stop() {
 	app.stopOnce.Do(func() {
 		close(app.done)
@@ -110,6 +99,36 @@ func (app *Application) ProcessMainEvent(event *sdk.Event) {
 			fmt.Printf("Error on response: %s", err)
 		}
 	case "moduleRequest":
+		var moduleRequest sdk.ModuleRequest
+
+		err := json.Unmarshal(packet.Params, &moduleRequest)
+		if err != nil {
+			app.Main.Respond(packet.ID, nil, &sdk.RPCError{
+				Code:    1,
+				Message: fmt.Sprintf("Invalid module request: %s", err),
+			})
+			return
+		}
+
+		helper, exists := app.Helpers[moduleRequest.Module]
+		if !exists {
+			app.Main.Respond(packet.ID, nil, &sdk.RPCError{
+				Code:    1,
+				Message: fmt.Sprintf("Module not found: %s", moduleRequest.Module),
+			})
+			return
+		}
+
+		res, err := helper.Send(moduleRequest.Method, moduleRequest.Params)
+		if err != nil {
+			app.Main.Respond(packet.ID, nil, &sdk.RPCError{
+				Code:    1,
+				Message: fmt.Sprintf("Module returned error: %s", err),
+			})
+			return
+		} else {
+			app.Main.Respond(packet.ID, res.Result, nil)
+		}
 	}
 }
 

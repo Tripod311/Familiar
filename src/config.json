@@ -13,10 +13,19 @@
         "main": {
             "name": "ui",
             "configuration": {
-                "port": 8080
+                "port": 8080,
+                "history": "short_history"
             }
         },
 
-        "helpers": {}
+        "helpers": {
+            "short_history": {
+                "name": "history",
+                "configuration": {
+                    "size": 100,
+                    "store":  true
+                }
+            }
+        }
     }
 }

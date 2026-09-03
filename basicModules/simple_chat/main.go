@@ -9,6 +9,13 @@ import (
 	sdk "tripod311/familiar-sdk"
 )
 
+type UIConfig struct {
+	Port      int    `json:"port"`
+	ClientDir string `json:"clientDir"`
+	History   string `json:"history"`
+}
+
+var config UIConfig
 var module *sdk.ExternalModule
 var server *Server
 
@@ -31,7 +38,12 @@ func Shutdown(params json.RawMessage) (json.RawMessage, error) {
 }
 
 func Setup(params json.RawMessage) (json.RawMessage, error) {
-	server = NewServer(params, SendRequest)
+	err := json.Unmarshal(params, &config)
+	if err != nil {
+		return nil, fmt.Errorf("Server config error: %s", err)
+	}
+
+	server = NewServer(config.Port, config.ClientDir, SendRequest)
 
 	if err := server.Start(); err != nil {
 		return nil, fmt.Errorf("Server start error: %s", err)
@@ -41,12 +53,18 @@ func Setup(params json.RawMessage) (json.RawMessage, error) {
 }
 
 func SendRequest(message string) (string, error) {
-	req := []sdk.Message{
-		{
-			Role:    sdk.RoleUser,
-			Content: message,
-		},
+	// fetch context
+
+	// fetch history
+	req, err := FetchHistory()
+	if err != nil {
+		return "", err
 	}
+
+	req = append(req, sdk.Message{
+		Role:    sdk.RoleUser,
+		Content: message,
+	})
 
 	data, err := json.Marshal(req)
 	if err != nil {
@@ -65,5 +83,64 @@ func SendRequest(message string) (string, error) {
 		return "", err
 	}
 
+	// append history
+	err = AppendHistory(resMsg)
+	if err != nil {
+		return resMsg.Content, err
+	}
+
 	return resMsg.Content, nil
+}
+
+func FetchHistory() ([]sdk.Message, error) {
+	var result []sdk.Message
+
+	if len(config.History) > 0 {
+		historyRequest := sdk.ModuleRequest{
+			Module: config.History,
+			Method: "get",
+		}
+		bytes, err := json.Marshal(historyRequest)
+		if err != nil {
+			return nil, fmt.Errorf("History request building error: %s", err)
+		}
+
+		raw, err := module.Send("moduleRequest", bytes)
+		if err != nil {
+			return nil, fmt.Errorf("History request building error: %s", err)
+		}
+
+		err = json.Unmarshal(raw, &result)
+		if err != nil {
+			return nil, fmt.Errorf("History module response error: %s", err)
+		}
+	}
+
+	return result, nil
+}
+
+func AppendHistory(msg sdk.Message) error {
+	if len(config.History) > 0 {
+		msgBytes, err := json.Marshal(msg)
+		if err != nil {
+			return fmt.Errorf("History append message serialization error: %s", err)
+		}
+
+		historyRequest := sdk.ModuleRequest{
+			Module: config.History,
+			Method: "append",
+			Params: msgBytes,
+		}
+		bytes, err := json.Marshal(historyRequest)
+		if err != nil {
+			return fmt.Errorf("History request building error: %s", err)
+		}
+
+		_, err = module.Send("moduleRequest", bytes)
+		if err != nil {
+			return fmt.Errorf("History request building error: %s", err)
+		}
+	}
+
+	return nil
 }
