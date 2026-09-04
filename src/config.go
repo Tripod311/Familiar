@@ -17,6 +17,8 @@ type AppConfiguration struct {
 	Model        string                         `json:"model"`
 	Port         int                            `json:"port"`
 	LoopLimit    uint                           `json:"loopLimit"`
+	Temperature  float64                        `json:"temperature"`
+	TopP         float64                        `json:"top_p"`
 	Verbose      bool                           `json:"verbose"`
 	StartTimeout uint                           `json:"startTimeout"`
 	Main         ModuleConfiguration            `json:"main"`

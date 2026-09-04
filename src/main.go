@@ -42,6 +42,8 @@ func LoadModel(config Configuration) (*Model, error) {
 
 	srv.Port = config.App.Port
 	srv.LoopLimit = config.App.LoopLimit
+	srv.Temperature = config.App.Temperature
+	srv.TopP = config.App.TopP
 	srv.Exec = resolveConfigPath(engineDir, srv.Exec)
 
 	modelPath := resolveConfigPath(

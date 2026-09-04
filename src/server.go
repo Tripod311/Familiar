@@ -29,7 +29,9 @@ type Server struct {
 	Description       string   `json:"description"`
 	Exec              string   `json:"exec"`
 	Args              []string `json:"args"`
-	LoopLimit         uint     `json:"loopLimit"`
+	LoopLimit         uint
+	Temperature       float64
+	TopP              float64
 	Port              int
 	Model             string
 	Status            ServerStatus
@@ -197,6 +199,9 @@ func (server *Server) Request(
 	} else {
 		loopLimit = 16
 	}
+
+	req.Temperature = &server.Temperature
+	req.TopP = &server.TopP
 
 	for iteration := 0; iteration < int(loopLimit); iteration++ {
 		res, err := server.complete(req)

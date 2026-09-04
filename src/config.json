@@ -5,10 +5,13 @@
 
     "app": {
         "port": 14000,
-        "verbose": false,
+        "verbose": true,
         "startTimeout": 60,
+        "temperature": 0.1,
+        "top_p": 0.8,
+
         "engine": "ubuntu-vulkan-llama",
-        "model": "Qwen3-0.6B-Q8_0.gguf",
+        "model": "Qwen3-1.7B-Q8_0.gguf",
         
         "main": {
             "name": "ui",

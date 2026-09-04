@@ -50,8 +50,10 @@ type Tool struct {
 }
 
 type ServerRequest struct {
-	Tools    []Tool    `json:"tools,omitempty"`
-	Messages []Message `json:"messages"`
+	Tools       []Tool    `json:"tools,omitempty"`
+	Messages    []Message `json:"messages"`
+	Temperature *float64  `json:"temperature,omitempty"`
+	TopP        *float64  `json:"top_p,omitempty"`
 }
 
 type ServerResponse struct {

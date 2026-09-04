@@ -136,28 +136,34 @@ func Dump() {
 func ProcessPacket(method string, params json.RawMessage) (json.RawMessage, error) {
 	switch method {
 	case "get_context":
+		systemContent := systemPrompt
+
+		if config.UseMemory {
+			systemContent += fmt.Sprintf(
+				"\n\nCurrent memory state:\n<data role=\"memory\">\n%s\n</data>",
+				memoryState,
+			)
+		}
+
 		result := []sdk.Message{
 			{
 				Role:    sdk.RoleSystem,
-				Content: systemPrompt,
+				Content: systemContent,
 			},
-		}
-
-		if config.UseMemory {
-			result = append(result, sdk.Message{
-				Role:    sdk.RoleSystem,
-				Content: fmt.Sprintf("Current memory state:\n<data role='memory'>%s</data>", memoryState),
-			})
 		}
 
 		bytes, err := json.Marshal(result)
 		if err != nil {
-			return nil, fmt.Errorf("Context serialization error: %s", err)
+			return nil, fmt.Errorf(
+				"context serialization error: %w",
+				err,
+			)
 		}
 
 		return bytes, nil
+
 	default:
-		return nil, fmt.Errorf("Unknown method: %s", method)
+		return nil, fmt.Errorf("unknown method: %s", method)
 	}
 }
 
