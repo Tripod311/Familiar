@@ -5,7 +5,7 @@
 
     "app": {
         "port": 14000,
-        "verbose": true,
+        "verbose": false,
         "startTimeout": 60,
         "engine": "ubuntu-vulkan-llama",
         "model": "Qwen3-0.6B-Q8_0.gguf",
@@ -32,6 +32,14 @@
                 "configuration": {
                     "store": true,
                     "useMemory": true
+                }
+            },
+            "knowledge": {
+                "name": "knowledge",
+                "configuration": {
+                    "allowAppend": true,
+                    "maxAppendixSize": 262144,
+                    "searchLimit": 5
                 }
             }
         }
