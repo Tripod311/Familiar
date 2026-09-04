@@ -59,7 +59,26 @@ func (app *Application) ProcessMainEvent(event *sdk.Event) {
 
 	switch packet.Method {
 	case "modelRequest":
-		tools := make([]sdk.ToolDescription, 0)
+		tools := make([]sdk.Tool, 0)
+
+		for _, desc := range app.Main.Tools {
+			tools = append(tools, sdk.Tool{
+				Type:     "function",
+				Function: desc,
+				Call:     app.Main.CallFunction,
+			})
+		}
+
+		for _, module := range app.Helpers {
+			for _, desc := range module.Tools {
+				tools = append(tools, sdk.Tool{
+					Type:     "function",
+					Function: desc,
+					Call:     module.CallFunction,
+				})
+			}
+		}
+
 		var messages []sdk.Message
 
 		err := json.Unmarshal(packet.Params, &messages)

@@ -14,7 +14,8 @@
             "name": "ui",
             "configuration": {
                 "port": 8080,
-                "history": "short_history"
+                "history": "short_history",
+                "context": "context"
             }
         },
 
@@ -24,6 +25,13 @@
                 "configuration": {
                     "size": 100,
                     "store":  true
+                }
+            },
+            "context": {
+                "name": "context",
+                "configuration": {
+                    "store": true,
+                    "useMemory": true
                 }
             }
         }

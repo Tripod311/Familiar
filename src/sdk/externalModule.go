@@ -14,6 +14,9 @@ type ExternalModule struct {
 	UnloadHandle   func(params json.RawMessage) (json.RawMessage, error)
 	MethodHandle   func(method string, params json.RawMessage) (json.RawMessage, error)
 	ShutdownHandle func() error
+
+	CallFunction    func(name string, arguments string) (json.RawMessage, error)
+	GatherFunctions func() ([]ToolDescription, error)
 }
 
 func NewExternalModule() *ExternalModule {
@@ -86,6 +89,61 @@ func (em *ExternalModule) ProcessPacket(event *Event) {
 		em.Shutdown(&Event{})
 
 		go em.Stop()
+	case "gatherFunctions":
+		var functions []ToolDescription
+
+		if em.GatherFunctions != nil {
+			f, err := em.GatherFunctions()
+			if err != nil {
+				em.connector.Respond(packet.ID, nil, &RPCError{
+					Code:    1,
+					Message: fmt.Sprintf("Gather functions error: %s", err),
+				})
+				return
+			}
+			functions = f
+		}
+
+		bytes, err := json.Marshal(functions)
+		if err != nil {
+			em.connector.Respond(packet.ID, nil, &RPCError{
+				Code:    1,
+				Message: fmt.Sprintf("Gather functions, serialization error: %s", err),
+			})
+			return
+		}
+
+		em.connector.Respond(packet.ID, bytes, nil)
+	case "callFunction":
+		if em.CallFunction != nil {
+			var callData FunctionCall
+
+			err := json.Unmarshal(packet.Params, &callData)
+			if err != nil {
+				em.connector.Respond(packet.ID, nil, &RPCError{
+					Code:    1,
+					Message: fmt.Sprintf("Call function deserialization error: %s", err),
+				})
+				return
+			}
+
+			result, err := em.CallFunction(callData.Name, callData.Arguments)
+			if err != nil {
+				em.connector.Respond(packet.ID, nil, &RPCError{
+					Code:    1,
+					Message: fmt.Sprintf("Call function execution error: %s", err),
+				})
+				return
+			}
+
+			em.connector.Respond(packet.ID, result, nil)
+		} else {
+			em.connector.Respond(packet.ID, nil, &RPCError{
+				Code:    1,
+				Message: "Call function handler is not defined",
+			})
+			return
+		}
 	default:
 		if em.MethodHandle != nil {
 			result, err := em.MethodHandle(packet.Method, packet.Params)

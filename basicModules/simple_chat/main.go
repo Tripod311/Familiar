@@ -13,6 +13,7 @@ type UIConfig struct {
 	Port      int    `json:"port"`
 	ClientDir string `json:"clientDir"`
 	History   string `json:"history"`
+	Context   string `json:"context"`
 }
 
 var config UIConfig
@@ -54,12 +55,18 @@ func Setup(params json.RawMessage) (json.RawMessage, error) {
 
 func SendRequest(message string) (string, error) {
 	// fetch context
-
-	// fetch history
-	req, err := FetchHistory()
+	req, err := FetchContext()
 	if err != nil {
 		return "", err
 	}
+
+	// fetch history
+	hist, err := FetchHistory()
+	if err != nil {
+		return "", err
+	}
+
+	req = append(req, hist...)
 
 	req = append(req, sdk.Message{
 		Role:    sdk.RoleUser,
@@ -92,6 +99,33 @@ func SendRequest(message string) (string, error) {
 	return resMsg.Content, nil
 }
 
+func FetchContext() ([]sdk.Message, error) {
+	var result []sdk.Message
+
+	if len(config.Context) > 0 {
+		contextRequest := sdk.ModuleRequest{
+			Module: config.Context,
+			Method: "get_context",
+		}
+		bytes, err := json.Marshal(contextRequest)
+		if err != nil {
+			return nil, fmt.Errorf("Context request building error: %s", err)
+		}
+
+		raw, err := module.Send("moduleRequest", bytes)
+		if err != nil {
+			return nil, fmt.Errorf("Context request sending error: %s", err)
+		}
+
+		err = json.Unmarshal(raw, &result)
+		if err != nil {
+			return nil, fmt.Errorf("Context module response error: %s", err)
+		}
+	}
+
+	return result, nil
+}
+
 func FetchHistory() ([]sdk.Message, error) {
 	var result []sdk.Message
 
@@ -107,7 +141,7 @@ func FetchHistory() ([]sdk.Message, error) {
 
 		raw, err := module.Send("moduleRequest", bytes)
 		if err != nil {
-			return nil, fmt.Errorf("History request building error: %s", err)
+			return nil, fmt.Errorf("History request sending error: %s", err)
 		}
 
 		err = json.Unmarshal(raw, &result)
@@ -133,7 +167,7 @@ func AppendHistory(msg sdk.Message) error {
 		}
 		bytes, err := json.Marshal(historyRequest)
 		if err != nil {
-			return fmt.Errorf("History request building error: %s", err)
+			return fmt.Errorf("History request sending error: %s", err)
 		}
 
 		_, err = module.Send("moduleRequest", bytes)

@@ -20,6 +20,8 @@ type Module struct {
 	Exec        string   `json:"exec"`
 	Args        []string `json:"args"`
 
+	Tools []sdk.ToolDescription
+
 	connector *sdk.RPCConnector
 	instance  *exec.Cmd
 	stdin     io.WriteCloser
@@ -205,4 +207,36 @@ func (module *Module) moduleDisconnected(event *sdk.Event) {
 		Command: "closed",
 		Data:    message,
 	})
+}
+
+func (module *Module) GatherFunctions() error {
+	packet, err := module.Send("gatherFunctions", nil)
+	if err != nil {
+		return err
+	}
+
+	if packet.Error != nil {
+		return fmt.Errorf("Gather functions error: %s", packet.Error.Message)
+	}
+
+	err = json.Unmarshal(packet.Result, &module.Tools)
+	return err
+}
+
+func (module *Module) CallFunction(call sdk.FunctionCall) (json.RawMessage, error) {
+	bytes, err := json.Marshal(call)
+	if err != nil {
+		return nil, fmt.Errorf("Function call serialization error: %s", err)
+	}
+
+	packet, err := module.Send("callFunction", bytes)
+	if err != nil {
+		return nil, fmt.Errorf("Function call error: %s", err)
+	}
+
+	if packet.Error != nil {
+		return nil, fmt.Errorf("Function call error: %s", packet.Error.Message)
+	}
+
+	return packet.Result, nil
 }

@@ -32,8 +32,8 @@ type ToolCall struct {
 }
 
 type FunctionCall struct {
-	Name      string          `json:"name"`
-	Arguments json.RawMessage `json:"arguments"`
+	Name      string `json:"name"`
+	Arguments string `json:"arguments"`
 }
 
 type ToolDescription struct {
@@ -44,13 +44,14 @@ type ToolDescription struct {
 }
 
 type Tool struct {
-	Type     string          `json:"type"`
-	Function ToolDescription `json:"function"`
+	Type     string                                      `json:"type"`
+	Function ToolDescription                             `json:"function"`
+	Call     func(FunctionCall) (json.RawMessage, error) `json:"-"`
 }
 
 type ServerRequest struct {
-	Tools    []ToolDescription `json:"tools,omitempty"`
-	Messages []Message         `json:"messages"`
+	Tools    []Tool    `json:"tools,omitempty"`
+	Messages []Message `json:"messages"`
 }
 
 type ServerResponse struct {
@@ -69,11 +70,6 @@ type Usage struct {
 	PromptTokens     int `json:"prompt_tokens"`
 	CompletionTokens int `json:"completion_tokens"`
 	TotalTokens      int `json:"total_tokens"`
-}
-
-type ToolCallEventData struct {
-	Request *ServerRequest
-	Call    *ToolCall
 }
 
 // module request

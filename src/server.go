@@ -29,6 +29,7 @@ type Server struct {
 	Description       string   `json:"description"`
 	Exec              string   `json:"exec"`
 	Args              []string `json:"args"`
+	LoopLimit         uint     `json:"loopLimit"`
 	Port              int
 	Model             string
 	Status            ServerStatus
@@ -186,39 +187,113 @@ func (server *Server) handleExit() {
 	server.Status = DOWN
 }
 
-func (server *Server) Request(req *sdk.ServerRequest) (*sdk.Message, error) {
-	for iteration := 0; iteration < 16; iteration++ {
-		res, err := server.complete(req)
+func (server *Server) Request(
+	req *sdk.ServerRequest,
+) (*sdk.Message, error) {
+	var loopLimit uint
 
+	if server.LoopLimit > 0 {
+		loopLimit = server.LoopLimit
+	} else {
+		loopLimit = 16
+	}
+
+	for iteration := 0; iteration < int(loopLimit); iteration++ {
+		res, err := server.complete(req)
 		if err != nil {
-			return nil, fmt.Errorf("Error: %s", err)
+			return nil, fmt.Errorf("complete request: %w", err)
 		}
 
 		if len(res.Choices) == 0 {
-			return nil, fmt.Errorf("Error: empty response")
+			return nil, fmt.Errorf("empty model response")
 		}
 
 		assistant := res.Choices[0].Message
 		req.Messages = append(req.Messages, assistant)
 
-		// process response
-		if len(assistant.ToolCalls) > 0 {
-			// process tool calls
-			for _, call := range assistant.ToolCalls {
-				server.Emit(sdk.Event{
-					Command: "ToolCall",
-					Data: sdk.ToolCallEventData{
-						Request: req,
-						Call:    &call,
-					},
-				})
-			}
-		} else {
+		if len(assistant.ToolCalls) == 0 {
 			return &assistant, nil
+		}
+
+		for _, call := range assistant.ToolCalls {
+			var selectedTool *sdk.Tool
+
+			for i := range req.Tools {
+				tool := &req.Tools[i]
+
+				if tool.Function.Name == call.Function.Name {
+					selectedTool = tool
+					break
+				}
+			}
+
+			if selectedTool == nil {
+				errorResult, _ := json.Marshal(map[string]any{
+					"success": false,
+					"error": fmt.Sprintf(
+						"tool not found: %s",
+						call.Function.Name,
+					),
+				})
+
+				req.Messages = append(req.Messages, sdk.Message{
+					Role:       sdk.RoleTool,
+					ToolCallID: call.ID,
+					Content:    string(errorResult),
+				})
+
+				continue
+			}
+
+			if selectedTool.Call == nil {
+				errorResult, _ := json.Marshal(map[string]any{
+					"success": false,
+					"error": fmt.Sprintf(
+						"tool %s has no handler",
+						call.Function.Name,
+					),
+				})
+
+				req.Messages = append(req.Messages, sdk.Message{
+					Role:       sdk.RoleTool,
+					ToolCallID: call.ID,
+					Content:    string(errorResult),
+				})
+
+				continue
+			}
+
+			result, err := selectedTool.Call(call.Function)
+			if err != nil {
+				errorResult, _ := json.Marshal(map[string]any{
+					"success": false,
+					"error":   err.Error(),
+				})
+
+				req.Messages = append(req.Messages, sdk.Message{
+					Role:       sdk.RoleTool,
+					ToolCallID: call.ID,
+					Content:    string(errorResult),
+				})
+
+				continue
+			}
+
+			if len(result) == 0 {
+				result = json.RawMessage(`null`)
+			}
+
+			req.Messages = append(req.Messages, sdk.Message{
+				Role:       sdk.RoleTool,
+				ToolCallID: call.ID,
+				Content:    string(result),
+			})
 		}
 	}
 
-	return nil, fmt.Errorf("Tool loop exceeded iteration limit")
+	return nil, fmt.Errorf(
+		"tool loop exceeded iterationillen limit",
+	)
 }
 
 func (server *Server) complete(req *sdk.ServerRequest) (*sdk.ServerResponse, error) {

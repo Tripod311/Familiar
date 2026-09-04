@@ -16,6 +16,7 @@ type AppConfiguration struct {
 	Engine       string                         `json:"engine"`
 	Model        string                         `json:"model"`
 	Port         int                            `json:"port"`
+	LoopLimit    uint                           `json:"loopLimit"`
 	Verbose      bool                           `json:"verbose"`
 	StartTimeout uint                           `json:"startTimeout"`
 	Main         ModuleConfiguration            `json:"main"`

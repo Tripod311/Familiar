@@ -35,6 +35,7 @@ func LoadModel(config Configuration) (*Model, error) {
 	}
 
 	srv.Port = config.App.Port
+	srv.LoopLimit = config.App.LoopLimit
 	path = fmt.Sprintf("%s/%s/%s", config.EnginesDir, config.App.Engine, srv.Exec)
 	absPath, err = filepath.Abs(path)
 	if err != nil {
@@ -166,6 +167,29 @@ func run() error {
 	}
 
 	if response.Error != nil {
+		return fmt.Errorf(
+			"module %s failed to load: (%d) %s",
+			app.Main.Name,
+			response.Error.Code,
+			response.Error.Message,
+		)
+	}
+
+	// collect functions
+	for key, moduleConf := range config.App.Helpers {
+		err := app.Helpers[key].GatherFunctions()
+		if err != nil {
+			return fmt.Errorf(
+				"helper %s (%s) failed to gather functions: %w",
+				key,
+				moduleConf.Name,
+				err,
+			)
+		}
+	}
+
+	err = app.Main.GatherFunctions()
+	if err != nil {
 		return fmt.Errorf(
 			"module %s failed to load: (%d) %s",
 			app.Main.Name,
