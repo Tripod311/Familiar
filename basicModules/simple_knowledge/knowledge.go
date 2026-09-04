@@ -129,7 +129,7 @@ func (base *Knowledge) Load() error {
 	for _, entry := range entries {
 		if !entry.IsDir() {
 			if entry.Name() == "__appendix.md" {
-				content, err := os.ReadFile(fmt.Sprintf("%s/%s", docsPath, entry.Name()))
+				content, err := os.ReadFile(filepath.Join(docsPath, entry.Name()))
 
 				if err != nil {
 					fmt.Fprintf(os.Stderr, "Failed to load %s: %s", entry.Name(), err)
@@ -145,7 +145,7 @@ func (base *Knowledge) Load() error {
 					base.Append(chunk.Tags, chunk.Content)
 				}
 			} else if strings.HasSuffix(entry.Name(), ".md") {
-				content, err := os.ReadFile(fmt.Sprintf("%s/%s", docsPath, entry.Name()))
+				content, err := os.ReadFile(filepath.Join(docsPath, entry.Name()))
 
 				if err != nil {
 					fmt.Fprintf(os.Stderr, "Failed to load %s: %s", entry.Name(), err)

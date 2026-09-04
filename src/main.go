@@ -2,54 +2,67 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
-	"io"
 	"log"
 	"os"
 	"os/signal"
 	"path/filepath"
-	"syscall"
 )
 
 func LoadModel(config Configuration) (*Model, error) {
-	path := fmt.Sprintf("%s/%s/manifest.json", config.EnginesDir, config.App.Engine)
-	absPath, err := filepath.Abs(path)
-	if err != nil {
-		return nil, fmt.Errorf("filepath.Abs %s: %s", config.App.Engine, err)
-	}
+	engineDir := filepath.Join(
+		config.EnginesDir,
+		config.App.Engine,
+	)
 
-	file, err := os.Open(absPath)
-	if err != nil {
-		return nil, fmt.Errorf("Can't find inference engine %s: %s", config.App.Engine, err)
-	}
+	manifestPath := filepath.Join(
+		engineDir,
+		"manifest.json",
+	)
 
-	byteValue, err := io.ReadAll(file)
+	manifestData, err := os.ReadFile(manifestPath)
 	if err != nil {
-		return nil, fmt.Errorf("Can't read inference engine %s manifest: %s", config.App.Engine, err)
+		return nil, fmt.Errorf(
+			"can't read inference engine %s manifest: %w",
+			config.App.Engine,
+			err,
+		)
 	}
 
 	srv := NewServer()
-	err = json.Unmarshal(byteValue, &srv)
-	if err != nil {
-		return nil, fmt.Errorf("Inference engine %s corrupted manifest: %s", config.App.Engine, err)
+
+	if err := json.Unmarshal(manifestData, srv); err != nil {
+		return nil, fmt.Errorf(
+			"inference engine %s has corrupted manifest: %w",
+			config.App.Engine,
+			err,
+		)
 	}
 
 	srv.Port = config.App.Port
 	srv.LoopLimit = config.App.LoopLimit
-	path = fmt.Sprintf("%s/%s/%s", config.EnginesDir, config.App.Engine, srv.Exec)
-	absPath, err = filepath.Abs(path)
-	if err != nil {
-		return nil, fmt.Errorf("filepath.Abs %s: %s", config.App.Engine, err)
-	}
-	srv.Exec = absPath
+	srv.Exec = resolveConfigPath(engineDir, srv.Exec)
 
-	modelPath, err := filepath.Abs(fmt.Sprintf("%s/%s", config.ModelsDir, config.App.Model))
+	modelPath := resolveConfigPath(
+		config.ModelsDir,
+		config.App.Model,
+	)
+
+	modelInfo, err := os.Stat(modelPath)
 	if err != nil {
-		return nil, fmt.Errorf("Model %s, can't get absolute path: %s", config.App.Model, err)
+		return nil, fmt.Errorf(
+			"model %s is not available: %w",
+			config.App.Model,
+			err,
+		)
 	}
-	file, err = os.Open(modelPath)
-	if err != nil {
-		return nil, fmt.Errorf("Model %s is not loaded: %s", config.App.Model, err)
+
+	if modelInfo.IsDir() {
+		return nil, fmt.Errorf(
+			"model path %q points to a directory",
+			modelPath,
+		)
 	}
 
 	model := NewModel()
@@ -59,10 +72,10 @@ func LoadModel(config Configuration) (*Model, error) {
 	return model, nil
 }
 
-func run() error {
+func run(configPath string) error {
 	app := NewApplication()
 
-	config := parseConfig()
+	config := parseConfig(configPath)
 
 	model, err := LoadModel(config)
 	if err != nil {
@@ -203,7 +216,6 @@ func run() error {
 	signal.Notify(
 		signals,
 		os.Interrupt,
-		syscall.SIGTERM,
 	)
 	defer signal.Stop(signals)
 
@@ -227,7 +239,15 @@ func run() error {
 }
 
 func main() {
-	if err := run(); err != nil {
+	configPath := flag.String(
+		"config",
+		"",
+		"path to the configuration file",
+	)
+
+	flag.Parse()
+
+	if err := run(*configPath); err != nil {
 		log.Print(err)
 		os.Exit(1)
 	}

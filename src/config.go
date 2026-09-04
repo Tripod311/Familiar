@@ -2,9 +2,9 @@ package main
 
 import (
 	"encoding/json"
-	"io"
 	"log"
 	"os"
+	"path/filepath"
 )
 
 type ModuleConfiguration struct {
@@ -30,23 +30,40 @@ type Configuration struct {
 	App        AppConfiguration `json:"app"`
 }
 
-func parseConfig() Configuration {
-	file, err := os.Open("./config.json")
-	if err != nil {
-		log.Fatal("configuration.json not found")
+func parseConfig(configPath string) Configuration {
+	if len(configPath) == 0 {
+		configPath = "config.json"
 	}
 
-	byteValue, err := io.ReadAll(file)
+	configPath, err := ResolveAppPath(configPath)
 	if err != nil {
-		log.Fatal("Can't read configuration file")
+		log.Fatalf("can't resolve configuration path: %v", err)
+	}
+
+	data, err := os.ReadFile(configPath)
+	if err != nil {
+		log.Fatalf("can't read configuration file %q: %v", configPath, err)
 	}
 
 	var result Configuration
 
-	err = json.Unmarshal(byteValue, &result)
-	if err != nil {
-		log.Fatal("Corrupted configuration file")
+	if err := json.Unmarshal(data, &result); err != nil {
+		log.Fatalf("corrupted configuration file %q: %v", configPath, err)
 	}
 
+	configDir := filepath.Dir(configPath)
+
+	result.EnginesDir = resolveConfigPath(configDir, result.EnginesDir)
+	result.ModelsDir = resolveConfigPath(configDir, result.ModelsDir)
+	result.ModulesDir = resolveConfigPath(configDir, result.ModulesDir)
+
 	return result
+}
+
+func resolveConfigPath(configDir, configuredPath string) string {
+	if filepath.IsAbs(configuredPath) {
+		return filepath.Clean(configuredPath)
+	}
+
+	return filepath.Join(configDir, configuredPath)
 }
