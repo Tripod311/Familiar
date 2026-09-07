@@ -36,7 +36,11 @@ async function sendMessage(message) {
         placeholder.remove();
 
         if (!response.ok) {
-            throw new Error(`Request failed: ${response.status}\n${response.statusText}`);
+            const errorText = await response.text();
+
+            throw new Error(
+                `${response.status} ${response.statusText}\n` + (errorText ? `\n${errorText}` : "")
+            );
         }
 
         const data = await response.json();

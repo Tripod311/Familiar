@@ -1,4 +1,6 @@
-plugins/*
+.vscode
+modules/*
 models/*
-inference_engines/*
-chats/*
+engines/*
+familiar
+familiar.exe

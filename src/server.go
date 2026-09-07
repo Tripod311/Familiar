@@ -23,11 +23,17 @@ const (
 	READY
 )
 
+type APIPaths struct {
+	Health  string `json:"health"`
+	Request string `json:"request"`
+}
+
 type Server struct {
 	sdk.Emitter
 	Name        string   `json:"name"`
 	Description string   `json:"description"`
 	Exec        string   `json:"exec"`
+	APIPaths    APIPaths `json:"apiPaths"`
 	Args        []string `json:"args"`
 	LoopLimit   uint
 
@@ -123,7 +129,7 @@ func (server *Server) Stop() {
 }
 
 func (server *Server) pollHealth(ctx context.Context, cancel context.CancelFunc) {
-	url := fmt.Sprintf("http://127.0.0.1:%d/health", server.Port)
+	url := fmt.Sprintf("http://127.0.0.1:%d%s", server.Port, server.APIPaths.Health)
 
 	ticker := time.NewTicker(250 * time.Millisecond)
 	defer ticker.Stop()
@@ -300,7 +306,7 @@ func (server *Server) Request(
 	}
 
 	return nil, fmt.Errorf(
-		"tool loop exceeded iterationillen limit",
+		"tool loop exceeded iteration limit",
 	)
 }
 
@@ -312,7 +318,7 @@ func (server *Server) complete(req *sdk.ServerRequest) (*sdk.ServerResponse, err
 
 	httpReq, err := http.NewRequest(
 		http.MethodPost,
-		fmt.Sprintf("http://127.0.0.1:%d/v1/chat/completions", server.Port),
+		fmt.Sprintf("http://127.0.0.1:%d%s", server.Port, server.APIPaths.Request),
 		bytes.NewReader(data),
 	)
 	if err != nil {

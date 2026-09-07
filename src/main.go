@@ -47,32 +47,39 @@ func LoadModel(config Configuration) (*Model, error) {
 	srv.MaxTokens = config.App.MaxTokens
 	srv.Exec = resolveConfigPath(engineDir, srv.Exec)
 
-	modelPath := resolveConfigPath(
-		config.ModelsDir,
-		config.App.Model,
-	)
-
-	modelInfo, err := os.Stat(modelPath)
-	if err != nil {
-		return nil, fmt.Errorf(
-			"model %s is not available: %w",
+	if len(config.App.Model) > 0 {
+		modelPath := resolveConfigPath(
+			config.ModelsDir,
 			config.App.Model,
-			err,
 		)
+
+		modelInfo, err := os.Stat(modelPath)
+		if err != nil {
+			return nil, fmt.Errorf(
+				"model %s is not available: %w",
+				config.App.Model,
+				err,
+			)
+		}
+
+		if modelInfo.IsDir() {
+			return nil, fmt.Errorf(
+				"model path %q points to a directory",
+				modelPath,
+			)
+		}
+
+		model := NewModel()
+		model.Server = srv
+		srv.Model = modelPath
+
+		return model, nil
+	} else {
+		model := NewModel()
+		model.Server = srv
+
+		return model, nil
 	}
-
-	if modelInfo.IsDir() {
-		return nil, fmt.Errorf(
-			"model path %q points to a directory",
-			modelPath,
-		)
-	}
-
-	model := NewModel()
-	model.Server = srv
-	srv.Model = modelPath
-
-	return model, nil
 }
 
 func run(configPath string) error {

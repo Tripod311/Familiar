@@ -11,8 +11,8 @@
         "top_p": 0.8,
         "max_tokens": 512,
 
-        "engine": "ubuntu-vulkan-llama",
-        "model": "Qwen3-0.6B-Q8_0.gguf",
+        "engine": "openRouter",
+        "model": "",
         
         "main": {
             "name": "ui",

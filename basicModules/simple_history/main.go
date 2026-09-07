@@ -151,17 +151,21 @@ func ProcessPacket(method string, params json.RawMessage) (json.RawMessage, erro
 
 		return bytes, nil
 	case "append":
-		var msg sdk.Message
+		var messages []*sdk.Message
 
-		if err := json.Unmarshal(params, &msg); err != nil {
+		if err := json.Unmarshal(params, &messages); err != nil {
 			return nil, fmt.Errorf(
 				"history append error: %w",
 				err,
 			)
 		}
 
-		history = append(history, &msg)
+		history = append(history, messages...)
 		trimHistory()
+
+		if config.Store && config.Size > 0 {
+			Dump()
+		}
 
 		return nil, nil
 	default:

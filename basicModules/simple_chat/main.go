@@ -68,10 +68,12 @@ func SendRequest(message string) (string, error) {
 
 	req = append(req, hist...)
 
-	req = append(req, sdk.Message{
+	userMessage := sdk.Message{
 		Role:    sdk.RoleUser,
 		Content: message,
-	})
+	}
+
+	req = append(req, userMessage)
 
 	data, err := json.Marshal(req)
 	if err != nil {
@@ -91,7 +93,10 @@ func SendRequest(message string) (string, error) {
 	}
 
 	// append history
-	err = AppendHistory(resMsg)
+	err = AppendHistory([]*sdk.Message{
+		&userMessage,
+		&resMsg,
+	})
 	if err != nil {
 		return resMsg.Content, err
 	}
@@ -153,9 +158,9 @@ func FetchHistory() ([]sdk.Message, error) {
 	return result, nil
 }
 
-func AppendHistory(msg sdk.Message) error {
+func AppendHistory(messages []*sdk.Message) error {
 	if len(config.History) > 0 {
-		msgBytes, err := json.Marshal(msg)
+		msgBytes, err := json.Marshal(messages)
 		if err != nil {
 			return fmt.Errorf("History append message serialization error: %s", err)
 		}
