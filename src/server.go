@@ -25,13 +25,16 @@ const (
 
 type Server struct {
 	sdk.Emitter
-	Name              string   `json:"name"`
-	Description       string   `json:"description"`
-	Exec              string   `json:"exec"`
-	Args              []string `json:"args"`
-	LoopLimit         uint
-	Temperature       float64
-	TopP              float64
+	Name        string   `json:"name"`
+	Description string   `json:"description"`
+	Exec        string   `json:"exec"`
+	Args        []string `json:"args"`
+	LoopLimit   uint
+
+	Temperature float64
+	TopP        float64
+	MaxTokens   uint
+
 	Port              int
 	Model             string
 	Status            ServerStatus

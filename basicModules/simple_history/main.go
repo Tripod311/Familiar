@@ -20,6 +20,8 @@ var history []*sdk.Message
 var module *sdk.ExternalModule
 
 func main() {
+	history = make([]*sdk.Message, 0)
+
 	module = sdk.NewExternalModule()
 
 	module.LoadHandle = Setup
@@ -30,7 +32,7 @@ func main() {
 }
 
 func Shutdown(params json.RawMessage) (json.RawMessage, error) {
-	if config.Store {
+	if config.Store && config.Size > 0 {
 		Dump()
 	}
 

@@ -18,10 +18,130 @@ type Application struct {
 	cleanupOnce sync.Once
 }
 
-func NewApplication() *Application {
+func NewApplication(model *Model, mainModule *Module, helpers map[string]*Module) *Application {
 	return &Application{
-		done: make(chan struct{}),
+		Model:   model,
+		Main:    mainModule,
+		Helpers: helpers,
+		done:    make(chan struct{}),
 	}
+}
+
+func (app *Application) Launch(mainConf *json.RawMessage, helpersConf map[string]*json.RawMessage) error {
+	// attach listeners
+
+	app.Main.On("packetReceived", app.ProcessMainEvent)
+	app.Main.On("closed", app.ProcessModuleClosed)
+
+	for _, module := range app.Helpers {
+		module.On("packetReceived", func(event *sdk.Event) {
+			app.ProcessHelperEvent(module, event)
+		})
+		module.On("closed", app.ProcessModuleClosed)
+	}
+
+	// start modules
+
+	if err := app.Main.Start(); err != nil {
+		return fmt.Errorf(
+			"module %s failed to start: %w",
+			app.Main.Name,
+			err,
+		)
+	}
+
+	for key, module := range app.Helpers {
+		if err := module.Start(); err != nil {
+			return fmt.Errorf(
+				"helper %s (%s) failed to start: %w",
+				key,
+				module.Name,
+				err,
+			)
+		}
+	}
+
+	// send load packets
+
+	for key, module := range app.Helpers {
+		conf, exist := helpersConf[key]
+		if !exist || conf == nil || *conf == nil {
+			return fmt.Errorf("Corrupted module configuration: %s", module.Name)
+		}
+
+		response, err := module.Send(
+			"load",
+			*conf,
+		)
+		if err != nil {
+			return fmt.Errorf(
+				"helper %s (%s) failed to load: %w",
+				key,
+				module.Name,
+				err,
+			)
+		}
+
+		if response.Error != nil {
+			return fmt.Errorf(
+				"helper %s (%s) failed to load: (%d) %s",
+				key,
+				module.Name,
+				response.Error.Code,
+				response.Error.Message,
+			)
+		}
+	}
+
+	if mainConf == nil || *mainConf == nil {
+		return fmt.Errorf("Corrupted module configuration: %s", app.Main.Name)
+	}
+
+	response, err := app.Main.Send(
+		"load",
+		*mainConf,
+	)
+	if err != nil {
+		return fmt.Errorf(
+			"module %s failed to load: %w",
+			app.Main.Name,
+			err,
+		)
+	}
+
+	if response.Error != nil {
+		return fmt.Errorf(
+			"module %s failed to load: (%d) %s",
+			app.Main.Name,
+			response.Error.Code,
+			response.Error.Message,
+		)
+	}
+
+	// collect functions
+
+	for key, module := range app.Helpers {
+		err := module.GatherFunctions()
+		if err != nil {
+			return fmt.Errorf(
+				"helper %s (%s) failed to gather functions: %w",
+				key,
+				module.Name,
+				err,
+			)
+		}
+	}
+
+	err = app.Main.GatherFunctions()
+	if err != nil {
+		return fmt.Errorf(
+			"module %s failed to gather functions: %s",
+			app.Main.Name,
+			err,
+		)
+	}
+
+	return nil
 }
 
 func (app *Application) Cleanup() {
@@ -145,9 +265,55 @@ func (app *Application) ProcessMainEvent(event *sdk.Event) {
 				Message: fmt.Sprintf("Module returned error: %s", err),
 			})
 			return
+		} else if res.Error != nil {
+			app.Main.Respond(packet.ID, nil, res.Error)
 		} else {
 			app.Main.Respond(packet.ID, res.Result, nil)
 		}
+	default:
+		app.Main.Respond(packet.ID, nil, &sdk.RPCError{
+			Code:    1,
+			Message: fmt.Sprintf("Unknown method: %s", packet.Method),
+		})
+	}
+}
+
+func (app *Application) ProcessHelperEvent(module *Module, event *sdk.Event) {
+	packet := event.Data.(sdk.RPCPacket)
+
+	switch packet.Method {
+	case "modelRequest":
+		var req sdk.ServerRequest
+
+		err := json.Unmarshal(packet.Params, &req)
+
+		res, err := app.Model.Request(&req)
+		if err != nil {
+			module.Respond(packet.ID, nil, &sdk.RPCError{
+				Code:    1,
+				Message: fmt.Sprintf("Packet processing error: %s", err),
+			})
+			return
+		}
+
+		bytes, err := json.Marshal(res)
+		if err != nil {
+			module.Respond(packet.ID, nil, &sdk.RPCError{
+				Code:    1,
+				Message: fmt.Sprintf("Packet response error: %s", err),
+			})
+			return
+		}
+
+		err = module.Respond(packet.ID, bytes, nil)
+		if err != nil {
+			fmt.Printf("Error on response: %s", err)
+		}
+	default:
+		module.Respond(packet.ID, nil, &sdk.RPCError{
+			Code:    1,
+			Message: fmt.Sprintf("Unknown method: %s", packet.Method),
+		})
 	}
 }
 

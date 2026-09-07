@@ -44,6 +44,7 @@ func LoadModel(config Configuration) (*Model, error) {
 	srv.LoopLimit = config.App.LoopLimit
 	srv.Temperature = config.App.Temperature
 	srv.TopP = config.App.TopP
+	srv.MaxTokens = config.App.MaxTokens
 	srv.Exec = resolveConfigPath(engineDir, srv.Exec)
 
 	modelPath := resolveConfigPath(
@@ -75,8 +76,6 @@ func LoadModel(config Configuration) (*Model, error) {
 }
 
 func run(configPath string) error {
-	app := NewApplication()
-
 	config := parseConfig(configPath)
 
 	model, err := LoadModel(config)
@@ -95,6 +94,7 @@ func run(configPath string) error {
 	}
 
 	helpers := make(map[string]*Module)
+	helpersConf := make(map[string]*json.RawMessage)
 
 	for key, moduleConf := range config.App.Helpers {
 		module, err := NewModule(
@@ -108,109 +108,18 @@ func run(configPath string) error {
 		}
 
 		helpers[key] = module
+		helpersConf[key] = &moduleConf.Configuration
 	}
 
-	app.Model = model
-	app.Main = mainModule
-	app.Helpers = helpers
+	app := NewApplication(model, mainModule, helpers)
 
 	defer app.Cleanup()
 
-	app.Main.On("packetReceived", app.ProcessMainEvent)
-	app.Main.On("closed", app.ProcessModuleClosed)
-
-	for _, module := range app.Helpers {
-		module.On("closed", app.ProcessModuleClosed)
-	}
-
 	app.Model.Start(config.App.StartTimeout, config.App.Verbose)
 
-	if err := app.Main.Start(); err != nil {
-		return fmt.Errorf(
-			"module %s failed to start: %w",
-			app.Main.Name,
-			err,
-		)
-	}
-
-	for key, module := range app.Helpers {
-		if err := module.Start(); err != nil {
-			return fmt.Errorf(
-				"helper %s (%s) failed to start: %w",
-				key,
-				module.Name,
-				err,
-			)
-		}
-	}
-
-	for key, moduleConf := range config.App.Helpers {
-		response, err := app.Helpers[key].Send(
-			"load",
-			moduleConf.Configuration,
-		)
-		if err != nil {
-			return fmt.Errorf(
-				"helper %s (%s) failed to load: %w",
-				key,
-				moduleConf.Name,
-				err,
-			)
-		}
-
-		if response.Error != nil {
-			return fmt.Errorf(
-				"helper %s (%s) failed to load: (%d) %s",
-				key,
-				moduleConf.Name,
-				response.Error.Code,
-				response.Error.Message,
-			)
-		}
-	}
-
-	response, err := app.Main.Send(
-		"load",
-		config.App.Main.Configuration,
-	)
+	err = app.Launch(&config.App.Main.Configuration, helpersConf)
 	if err != nil {
-		return fmt.Errorf(
-			"module %s failed to load: %w",
-			app.Main.Name,
-			err,
-		)
-	}
-
-	if response.Error != nil {
-		return fmt.Errorf(
-			"module %s failed to load: (%d) %s",
-			app.Main.Name,
-			response.Error.Code,
-			response.Error.Message,
-		)
-	}
-
-	// collect functions
-	for key, moduleConf := range config.App.Helpers {
-		err := app.Helpers[key].GatherFunctions()
-		if err != nil {
-			return fmt.Errorf(
-				"helper %s (%s) failed to gather functions: %w",
-				key,
-				moduleConf.Name,
-				err,
-			)
-		}
-	}
-
-	err = app.Main.GatherFunctions()
-	if err != nil {
-		return fmt.Errorf(
-			"module %s failed to load: (%d) %s",
-			app.Main.Name,
-			response.Error.Code,
-			response.Error.Message,
-		)
+		return err
 	}
 
 	signals := make(chan os.Signal, 1)

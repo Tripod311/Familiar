@@ -19,6 +19,7 @@ type AppConfiguration struct {
 	LoopLimit    uint                           `json:"loopLimit"`
 	Temperature  float64                        `json:"temperature"`
 	TopP         float64                        `json:"top_p"`
+	MaxTokens    uint                           `json:"max_tokens"`
 	Verbose      bool                           `json:"verbose"`
 	StartTimeout uint                           `json:"startTimeout"`
 	Main         ModuleConfiguration            `json:"main"`

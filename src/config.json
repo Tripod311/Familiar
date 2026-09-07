@@ -9,9 +9,10 @@
         "startTimeout": 60,
         "temperature": 0.1,
         "top_p": 0.8,
+        "max_tokens": 512,
 
         "engine": "ubuntu-vulkan-llama",
-        "model": "Qwen3-1.7B-Q8_0.gguf",
+        "model": "Qwen3-0.6B-Q8_0.gguf",
         
         "main": {
             "name": "ui",
@@ -26,7 +27,7 @@
             "short_history": {
                 "name": "history",
                 "configuration": {
-                    "size": 100,
+                    "size": 20,
                     "store":  true
                 }
             },
@@ -34,16 +35,16 @@
                 "name": "context",
                 "configuration": {
                     "store": true,
-                    "useMemory": true
+                    "useMemory": false
                 }
             },
-            "knowledge": {
-                "name": "knowledge",
-                "configuration": {
-                    "allowAppend": true,
-                    "maxAppendixSize": 262144,
-                    "searchLimit": 5
-                }
+            "records": {
+                "name": "records",
+                "configuration": {}
+            },
+            "datetime": {
+                "name": "datetime",
+                "configuration": {}
             }
         }
     }

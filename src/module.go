@@ -151,19 +151,27 @@ func (module *Module) Stop() {
 		return
 	}
 
+	module.started = false
+
 	response, err := module.Send("unload", nil)
 
 	if err != nil {
-		fmt.Printf("Module %s unload error: %s", module.Name, err)
-	}
-
-	if response.Error != nil {
-		fmt.Printf("Module %s unload error: %s", module.Name, fmt.Errorf("(%d) %s", response.Error.Code, response.Error.Message))
+		fmt.Printf("Module %s unload error: %s\n", module.Name, err)
+	} else if response != nil && response.Error != nil {
+		fmt.Printf(
+			"Module %s unload error: (%d) %s\n",
+			module.Name,
+			response.Error.Code,
+			response.Error.Message,
+		)
 	}
 
 	module.connector.Stop()
-	module.instance.Process.Kill()
-	module.instance.Wait()
+
+	if module.instance != nil && module.instance.Process != nil {
+		_ = module.instance.Process.Kill()
+		_ = module.instance.Wait()
+	}
 }
 
 func (module *Module) Send(method string, params json.RawMessage) (*sdk.RPCPacket, error) {

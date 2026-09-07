@@ -82,6 +82,8 @@ func (em *ExternalModule) ProcessPacket(event *Event) {
 			}
 
 			em.connector.Respond(packet.ID, result, nil)
+			em.Shutdown(&Event{})
+			go em.Stop()
 			return
 		}
 
