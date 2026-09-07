@@ -1,0 +1,21 @@
+site_name: Familiar
+
+docs_dir: docs
+site_dir: ../docs
+
+nav:
+  - Overview: index.md
+  - Roadmap: roadmap.md
+  - Application building: application_building.md
+  - Module development: module_development.md
+  - Demo bundles: demos.md
+
+theme:
+  name: material
+  favicon: assets/familiar.ico
+
+  features:
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - content.code.copy

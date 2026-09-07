@@ -1,0 +1,1592 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../application_building/">
+      
+      
+        <link rel="next" href="../demos/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/familiar.ico">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Module development - Familiar</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#developing-a-module" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Familiar" class="md-header__button md-logo" aria-label="Familiar" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Familiar
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Module development
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Familiar" class="md-nav__button md-logo" aria-label="Familiar" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Familiar
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../application_building/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Application building
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Module development
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Module development
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#module-process-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Module process model
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#json-rpc-protocol" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JSON-RPC protocol
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-the-go-sdk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using the Go SDK
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#module-lifecycle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Module lifecycle
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Module lifecycle">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#load" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        load
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#unload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        unload
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gatherfunctions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        gatherFunctions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#callfunction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        callFunction
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#custom-rpc-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom RPC methods
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#main-modules-and-helper-modules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Main modules and helper modules
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#main-module" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Main module
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Main module">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#modulerequest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        moduleRequest
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#main-module-model-requests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Main module model requests
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#messages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Messages
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#helper-modules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Helper modules
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#helper-model-requests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Helper model requests
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-helper-module" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example helper module
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#failure-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Failure model
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementing-modules-in-other-languages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementing modules in other languages
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#choosing-module-boundaries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Choosing module boundaries
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../demos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Demo bundles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#module-process-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Module process model
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#json-rpc-protocol" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JSON-RPC protocol
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-the-go-sdk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using the Go SDK
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#module-lifecycle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Module lifecycle
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Module lifecycle">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#load" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        load
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#unload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        unload
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gatherfunctions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        gatherFunctions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#callfunction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        callFunction
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#custom-rpc-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom RPC methods
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#main-modules-and-helper-modules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Main modules and helper modules
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#main-module" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Main module
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Main module">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#modulerequest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        moduleRequest
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#main-module-model-requests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Main module model requests
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#messages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Messages
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#helper-modules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Helper modules
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#helper-model-requests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Helper model requests
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-helper-module" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example helper module
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#failure-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Failure model
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementing-modules-in-other-languages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementing modules in other languages
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#choosing-module-boundaries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Choosing module boundaries
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="developing-a-module">Developing a Module</h1>
+<p>Familiar itself is written in Go and provides a small Go SDK for implementing modules.</p>
+<p>Several modules included in the repository are intentionally simple and can be used as examples when writing new ones.</p>
+<p>A Familiar module is a standalone subprocess. It communicates with the Familiar core using JSON-RPC messages over standard input and standard output.</p>
+<p>The module does not need to be written in Go. The Go SDK is only a convenience layer around the protocol.</p>
+<h2 id="module-process-model">Module process model</h2>
+<p>When Familiar starts a module, it launches the command defined in the module manifest and connects to its:</p>
+<ul>
+<li><code>stdin</code></li>
+<li><code>stdout</code></li>
+</ul>
+<p>These streams are used for JSON-RPC communication.</p>
+<p>Conceptually:</p>
+<pre><code class="language-text">Familiar core
+    |
+    | JSON-RPC
+    v
+module process
+</code></pre>
+<p>The process may internally do anything appropriate for the application:</p>
+<pre><code class="language-text">module
+├── local files
+├── database
+├── HTTP API
+├── another subprocess
+├── remote service
+└── its own LLM requests
+</code></pre>
+<p>Familiar does not inspect or control the internal architecture of a module.</p>
+<p>!!! warning</p>
+<pre><code>Standard output is used by the RPC protocol.
+
+A module should not write ordinary logs or debugging output to `stdout`, as this may corrupt the RPC stream.
+
+Use `stderr` for module logs instead.
+</code></pre>
+<h2 id="json-rpc-protocol">JSON-RPC protocol</h2>
+<p>Communication uses JSON-RPC 2.0-style packets.</p>
+<p>A request looks approximately like this:</p>
+<pre><code class="language-json">{
+    &quot;jsonrpc&quot;: &quot;2.0&quot;,
+    &quot;id&quot;: &quot;_12&quot;,
+    &quot;method&quot;: &quot;get_context&quot;,
+    &quot;params&quot;: {}
+}
+</code></pre>
+<p>A successful response:</p>
+<pre><code class="language-json">{
+    &quot;jsonrpc&quot;: &quot;2.0&quot;,
+    &quot;id&quot;: &quot;_12&quot;,
+    &quot;result&quot;: {}
+}
+</code></pre>
+<p>An error response:</p>
+<pre><code class="language-json">{
+    &quot;jsonrpc&quot;: &quot;2.0&quot;,
+    &quot;id&quot;: &quot;_12&quot;,
+    &quot;error&quot;: {
+        &quot;code&quot;: 1,
+        &quot;message&quot;: &quot;Something went wrong&quot;
+    }
+}
+</code></pre>
+<p>The Go SDK provides <code>RPCConnector</code> and <code>ExternalModule</code>, so modules written in Go normally do not need to work with these packets directly.</p>
+<h2 id="using-the-go-sdk">Using the Go SDK</h2>
+<p>A minimal Go module looks like this:</p>
+<pre><code class="language-go">package main
+
+import (
+    &quot;encoding/json&quot;
+
+    sdk &quot;tripod311/familiar-sdk&quot;
+)
+
+var module *sdk.ExternalModule
+
+func main() {
+    module = sdk.NewExternalModule()
+
+    module.LoadHandle = Setup
+    module.UnloadHandle = Shutdown
+    module.MethodHandle = ProcessPacket
+    module.GatherFunctions = GatherFunctions
+    module.CallFunction = CallFunction
+
+    module.Start()
+}
+</code></pre>
+<p><code>ExternalModule</code> creates the RPC connection over <code>stdin</code> and <code>stdout</code>, handles reserved Familiar methods, and dispatches application-specific requests to the provided handlers.</p>
+<p>Not every handler is required.</p>
+<p>A very small module may only implement <code>LoadHandle</code> and <code>MethodHandle</code>, while a module exposing LLM tools may also implement <code>GatherFunctions</code> and <code>CallFunction</code>.</p>
+<h2 id="module-lifecycle">Module lifecycle</h2>
+<p>Familiar uses several reserved methods for module lifecycle and tool integration.</p>
+<p>The most important are:</p>
+<pre><code class="language-text">load
+unload
+gatherFunctions
+callFunction
+</code></pre>
+<p>These names are handled by the SDK and should not normally be implemented through <code>MethodHandle</code>.</p>
+<h3 id="load"><code>load</code></h3>
+<p><code>load</code> is sent after the module process has started.</p>
+<p>The module receives the <code>configuration</code> object specified for it in the Familiar application configuration.</p>
+<p>For example:</p>
+<pre><code class="language-json">{
+    &quot;short_history&quot;: {
+        &quot;name&quot;: &quot;history&quot;,
+        &quot;configuration&quot;: {
+            &quot;size&quot;: 20,
+            &quot;store&quot;: true
+        }
+    }
+}
+</code></pre>
+<p>The history module receives:</p>
+<pre><code class="language-json">{
+    &quot;size&quot;: 20,
+    &quot;store&quot;: true
+}
+</code></pre>
+<p>A Go module handles this using <code>LoadHandle</code>:</p>
+<pre><code class="language-go">func Setup(params json.RawMessage) (json.RawMessage, error) {
+    if err := json.Unmarshal(params, &amp;config); err != nil {
+        return nil, err
+    }
+
+    return nil, nil
+}
+</code></pre>
+<p><code>load</code> is the normal place to:</p>
+<ul>
+<li>parse configuration;</li>
+<li>load persistent state;</li>
+<li>read prompts;</li>
+<li>open local files;</li>
+<li>prepare databases;</li>
+<li>initialize internal state.</li>
+</ul>
+<p>Returning an error causes application startup to fail.</p>
+<h3 id="unload"><code>unload</code></h3>
+<p><code>unload</code> is sent when Familiar shuts the application down.</p>
+<p>A module may use it to persist state or perform cleanup.</p>
+<p>Example:</p>
+<pre><code class="language-go">func Shutdown(params json.RawMessage) (json.RawMessage, error) {
+    if config.Store {
+        Dump()
+    }
+
+    return nil, nil
+}
+</code></pre>
+<p>For data that must survive unexpected process termination, it is usually better not to rely exclusively on <code>unload</code>. Persisting important state when it changes may be more appropriate.</p>
+<h3 id="gatherfunctions"><code>gatherFunctions</code></h3>
+<p><code>gatherFunctions</code> asks the module which LLM tools it currently exposes.</p>
+<p>In Go this is represented by:</p>
+<pre><code class="language-go">func GatherFunctions() ([]sdk.ToolDescription, error)
+</code></pre>
+<p>For example:</p>
+<pre><code class="language-go">func GatherFunctions() ([]sdk.ToolDescription, error) {
+    return []sdk.ToolDescription{
+        {
+            Name:        &quot;update_memory&quot;,
+            Description: &quot;Updates the persistent memory state.&quot;,
+            Strict:      true,
+            Parameters:  memorySchema,
+        },
+    }, nil
+}
+</code></pre>
+<p>A tool description contains:</p>
+<pre><code class="language-go">type ToolDescription struct {
+    Name        string
+    Description string
+    Strict      bool
+    Parameters  json.RawMessage
+}
+</code></pre>
+<p><code>Parameters</code> contains the JSON schema used for the tool arguments.</p>
+<p>The returned tools become available to the appropriate model requests.</p>
+<p>A module may also return an empty list:</p>
+<pre><code class="language-go">return []sdk.ToolDescription{}, nil
+</code></pre>
+<p>if it does not expose any LLM tools.</p>
+<h3 id="callfunction"><code>callFunction</code></h3>
+<p>When the model requests a tool exposed by the module, Familiar routes the call back to that module through <code>callFunction</code>.</p>
+<p>The Go SDK exposes it as:</p>
+<pre><code class="language-go">func CallFunction(
+    name string,
+    arguments string,
+) (json.RawMessage, error)
+</code></pre>
+<p>Example:</p>
+<pre><code class="language-go">func CallFunction(
+    name string,
+    arguments string,
+) (json.RawMessage, error) {
+    switch name {
+    case &quot;update_memory&quot;:
+        memoryState = []byte(arguments)
+
+        return nil, nil
+
+    default:
+        return nil, fmt.Errorf(
+            &quot;unknown function: %s&quot;,
+            name,
+        )
+    }
+}
+</code></pre>
+<p><code>arguments</code> contains the JSON arguments generated by the model.</p>
+<p>The module is responsible for parsing and validating them.</p>
+<h2 id="custom-rpc-methods">Custom RPC methods</h2>
+<p>Modules can expose their own RPC methods in addition to LLM tools.</p>
+<p>In the Go SDK these requests are handled by:</p>
+<pre><code class="language-go">MethodHandle func(
+    method string,
+    params json.RawMessage,
+) (json.RawMessage, error)
+</code></pre>
+<p>For example, a context module may expose:</p>
+<pre><code class="language-go">func ProcessPacket(
+    method string,
+    params json.RawMessage,
+) (json.RawMessage, error) {
+    switch method {
+    case &quot;get_context&quot;:
+        // Build context here.
+
+        return result, nil
+
+    default:
+        return nil, fmt.Errorf(
+            &quot;unknown method: %s&quot;,
+            method,
+        )
+    }
+}
+</code></pre>
+<p>These methods are application-specific.</p>
+<p>Familiar does not define what names such as:</p>
+<pre><code class="language-text">get_context
+append
+search
+save
+reset
+</code></pre>
+<p>mean.</p>
+<p>Their meaning is part of the contract between the modules used by a particular application.</p>
+<h2 id="main-modules-and-helper-modules">Main modules and helper modules</h2>
+<p>Familiar distinguishes between one <strong>main module</strong> and optional <strong>helper modules</strong>.</p>
+<p>They use the same subprocess protocol, but their role in the application is different.</p>
+<h2 id="main-module">Main module</h2>
+<p>The main module controls the primary application workflow.</p>
+<p>It may, for example:</p>
+<ul>
+<li>provide the user interface;</li>
+<li>expose an HTTP API;</li>
+<li>read context from helper modules;</li>
+<li>read and update history;</li>
+<li>build a model request;</li>
+<li>return the final model response to the user.</li>
+</ul>
+<p>The main module has access to two core methods:</p>
+<pre><code class="language-text">moduleRequest
+modelRequest
+</code></pre>
+<h3 id="modulerequest"><code>moduleRequest</code></h3>
+<p><code>moduleRequest</code> allows the main module to call an application-specific RPC method on a helper.</p>
+<p>The request uses:</p>
+<pre><code class="language-go">type ModuleRequest struct {
+    Module string          `json:&quot;module&quot;`
+    Method string          `json:&quot;method&quot;`
+    Params json.RawMessage `json:&quot;params,omitempty&quot;`
+}
+</code></pre>
+<p>For example, a main module may append new messages to a history helper:</p>
+<pre><code class="language-go">func AppendHistory(messages []*sdk.Message) error {
+    if len(config.History) == 0 {
+        return nil
+    }
+
+    msgBytes, err := json.Marshal(messages)
+    if err != nil {
+        return err
+    }
+
+    request := sdk.ModuleRequest{
+        Module: config.History,
+        Method: &quot;append&quot;,
+        Params: msgBytes,
+    }
+
+    data, err := json.Marshal(request)
+    if err != nil {
+        return err
+    }
+
+    _, err = module.Send(
+        &quot;moduleRequest&quot;,
+        data,
+    )
+
+    return err
+}
+</code></pre>
+<p>Here:</p>
+<pre><code class="language-text">config.History
+</code></pre>
+<p>contains the helper identifier from the application configuration.</p>
+<p>For example:</p>
+<pre><code class="language-json">{
+    &quot;helpers&quot;: {
+        &quot;short_history&quot;: {
+            &quot;name&quot;: &quot;history&quot;,
+            &quot;configuration&quot;: {}
+        }
+    }
+}
+</code></pre>
+<p>The module identifier is:</p>
+<pre><code class="language-text">short_history
+</code></pre>
+<p>The request:</p>
+<pre><code class="language-go">sdk.ModuleRequest{
+    Module: &quot;short_history&quot;,
+    Method: &quot;append&quot;,
+    Params: ...
+}
+</code></pre>
+<p>is routed by Familiar to that helper.</p>
+<p>Conceptually:</p>
+<pre><code class="language-text">Main module
+    |
+    | moduleRequest
+    v
+Familiar
+    |
+    | append
+    v
+History helper
+</code></pre>
+<p>The helper does not need to know which module sent the request. It simply handles its own <code>append</code> method.</p>
+<h2 id="main-module-model-requests">Main module model requests</h2>
+<p>The main module can request inference using:</p>
+<pre><code class="language-text">modelRequest
+</code></pre>
+<p>For the main module, the request body is a JSON array of <code>sdk.Message</code>.</p>
+<p>A typical workflow may look like:</p>
+<pre><code class="language-text">fetch context
+    |
+fetch history
+    |
+append user message
+    |
+modelRequest
+    |
+receive assistant message
+    |
+append conversation to history
+</code></pre>
+<p>For example:</p>
+<pre><code class="language-go">func SendRequest(message string) (string, error) {
+    req, err := FetchContext()
+    if err != nil {
+        return &quot;&quot;, err
+    }
+
+    history, err := FetchHistory()
+    if err != nil {
+        return &quot;&quot;, err
+    }
+
+    req = append(req, history...)
+
+    userMessage := sdk.Message{
+        Role:    sdk.RoleUser,
+        Content: message,
+    }
+
+    req = append(req, userMessage)
+
+    data, err := json.Marshal(req)
+    if err != nil {
+        return &quot;&quot;, err
+    }
+
+    response, err := module.Send(
+        &quot;modelRequest&quot;,
+        data,
+    )
+    if err != nil {
+        return &quot;&quot;, err
+    }
+
+    var assistantMessage sdk.Message
+
+    if err := json.Unmarshal(
+        response,
+        &amp;assistantMessage,
+    ); err != nil {
+        return &quot;&quot;, err
+    }
+
+    return assistantMessage.Content, nil
+}
+</code></pre>
+<p>Familiar takes these messages, adds the tools exposed by the main module and helper modules, sends the resulting request to the configured inference engine, handles tool calls, and returns the final assistant message.</p>
+<p>The main module therefore does not need to communicate directly with the inference server.</p>
+<h2 id="messages">Messages</h2>
+<p>The SDK uses an OpenAI-compatible message representation:</p>
+<pre><code class="language-go">type Message struct {
+    Role       Role       `json:&quot;role&quot;`
+    Content    string     `json:&quot;content,omitempty&quot;`
+    ToolCalls  []ToolCall `json:&quot;tool_calls,omitempty&quot;`
+    ToolCallID string     `json:&quot;tool_call_id,omitempty&quot;`
+}
+</code></pre>
+<p>Available roles are:</p>
+<pre><code class="language-go">RoleSystem
+RoleUser
+RoleAssistant
+RoleTool
+</code></pre>
+<p>A simple request may therefore be represented as:</p>
+<pre><code class="language-go">messages := []sdk.Message{
+    {
+        Role:    sdk.RoleSystem,
+        Content: &quot;You are a helpful assistant.&quot;,
+    },
+    {
+        Role:    sdk.RoleUser,
+        Content: &quot;Hello.&quot;,
+    },
+}
+</code></pre>
+<p>Tool calls use the usual OpenAI-style structures exposed by the SDK.</p>
+<h2 id="helper-modules">Helper modules</h2>
+<p>A helper module is intended to be an autonomous application component.</p>
+<p>It may expose:</p>
+<ul>
+<li>custom RPC methods;</li>
+<li>LLM tools;</li>
+<li>persistent local state;</li>
+<li>its own internal logic.</li>
+</ul>
+<p>Unlike the main module, a helper does not use <code>moduleRequest</code> to communicate with other helpers.</p>
+<p>This keeps helpers independent from each other.</p>
+<p>A helper can still use the inference engine itself.</p>
+<h2 id="helper-model-requests">Helper model requests</h2>
+<p>A helper may send its own:</p>
+<pre><code class="language-text">modelRequest
+</code></pre>
+<p>Unlike the main module, a helper sends a <code>ServerRequest</code>.</p>
+<p>For helper requests, the most important fields are:</p>
+<pre><code class="language-go">type ServerRequest struct {
+    Tools    []Tool
+    Messages []Message
+}
+</code></pre>
+<p>A helper can therefore create an isolated model interaction with its own messages and its own tools.</p>
+<p>Conceptually:</p>
+<pre><code class="language-text">Helper
+   |
+   | modelRequest
+   v
+Familiar
+   |
+   v
+Inference engine
+</code></pre>
+<p>This request does <strong>not</strong> automatically inherit the tools or internal state of the main application.</p>
+<p>For example, a document-search helper could provide only:</p>
+<pre><code class="language-text">search_documents
+read_document
+</code></pre>
+<p>to its own LLM request.</p>
+<p>The main application's tools remain unavailable unless the helper explicitly provides equivalent capabilities itself.</p>
+<p>This allows a helper to behave as a small specialized agent while remaining isolated from the main agent.</p>
+<p>A possible structure is:</p>
+<pre><code class="language-text">Main agent
+    |
+    | tool call
+    v
+Records helper
+    |
+    | isolated modelRequest
+    v
+Records search agent
+</code></pre>
+<p>The helper may use the same underlying inference engine as the main application, but the interaction has its own messages and capabilities.</p>
+<h2 id="example-helper-module">Example helper module</h2>
+<p>A context helper may combine several Familiar mechanisms.</p>
+<p>For example:</p>
+<pre><code class="language-go">func main() {
+    module = sdk.NewExternalModule()
+
+    module.LoadHandle = Setup
+    module.UnloadHandle = Shutdown
+    module.MethodHandle = ProcessPacket
+    module.GatherFunctions = GatherFunctions
+    module.CallFunction = CallFunction
+
+    module.Start()
+}
+</code></pre>
+<p>Its <code>Setup</code> handler may load:</p>
+<pre><code class="language-text">prompt.md
+memory.json
+dump.json
+</code></pre>
+<p>Its custom RPC method:</p>
+<pre><code class="language-text">get_context
+</code></pre>
+<p>may return a system message to the main module.</p>
+<p>At the same time, <code>GatherFunctions</code> may expose:</p>
+<pre><code class="language-text">update_memory
+</code></pre>
+<p>as an LLM tool.</p>
+<p>The same module can therefore provide both:</p>
+<pre><code class="language-text">RPC service for the main module
++
+LLM tool for the main agent
+</code></pre>
+<p>These mechanisms are independent.</p>
+<p>A module may use either one or both.</p>
+<h2 id="failure-model">Failure model</h2>
+<p>Familiar currently uses a simple <strong>all-or-nothing</strong> process model.</p>
+<p>If any critical application component stops unexpectedly, Familiar stops the whole application.</p>
+<p>This includes:</p>
+<ul>
+<li>the inference engine;</li>
+<li>the main module;</li>
+<li>any configured helper module.</li>
+</ul>
+<p>Conceptually:</p>
+<pre><code class="language-text">one required process fails
+        |
+        v
+application stops
+</code></pre>
+<p>Familiar does not currently attempt production-style recovery such as:</p>
+<ul>
+<li>restarting individual modules;</li>
+<li>retrying module initialization;</li>
+<li>reconstructing partially failed application state;</li>
+<li>transparently replacing failed components.</li>
+</ul>
+<p>This behavior is intentional for the current scope of the project.</p>
+<p>Familiar is primarily intended for local and experimental applications, where stopping the application on component failure keeps lifecycle behavior relatively simple and predictable.</p>
+<p>Applications that require more sophisticated recovery can implement additional behavior in their own components or extend the runtime.</p>
+<h2 id="implementing-modules-in-other-languages">Implementing modules in other languages</h2>
+<p>The Go SDK is optional.</p>
+<p>A module written in another language only needs to implement the same process protocol.</p>
+<p>At a high level, it needs to:</p>
+<ol>
+<li>Read newline-separated JSON-RPC packets from <code>stdin</code>.</li>
+<li>Handle reserved Familiar methods as necessary.</li>
+<li>Write JSON-RPC responses to <code>stdout</code>.</li>
+<li>Keep ordinary logging on <code>stderr</code>.</li>
+<li>Send requests such as <code>modelRequest</code> when supported by its role.</li>
+</ol>
+<p>For example, a Python module may be launched using a bundled virtual environment:</p>
+<pre><code class="language-json">{
+    &quot;name&quot;: &quot;python-module&quot;,
+    &quot;description&quot;: &quot;Example Python module&quot;,
+
+    &quot;exec&quot;: &quot;./venv/bin/python&quot;,
+
+    &quot;args&quot;: [
+        &quot;module.py&quot;
+    ]
+}
+</code></pre>
+<p>Its directory might contain:</p>
+<pre><code class="language-text">python-module/
+├── manifest.json
+├── module.py
+├── venv/
+└── data/
+</code></pre>
+<p>Familiar does not care whether the process is implemented in Go, Python, Node.js, Rust, C++, or another language.</p>
+<p>It only sees the RPC protocol.</p>
+<p>This also means a module does not necessarily need to implement its functionality locally. It may simply act as an adapter to another process or network service:</p>
+<pre><code class="language-text">Familiar
+    |
+    v
+module subprocess
+    |
+    v
+remote service
+</code></pre>
+<h2 id="choosing-module-boundaries">Choosing module boundaries</h2>
+<p>There is no required architecture for splitting an application into modules.</p>
+<p>The reference modules demonstrate one possible approach:</p>
+<pre><code class="language-text">UI
+History
+Context
+Knowledge
+Records
+Datetime
+</code></pre>
+<p>A different application may use completely different boundaries:</p>
+<pre><code class="language-text">HTTP API
+Customer database
+Report generator
+Search service
+</code></pre>
+<p>Modules do not need to be compatible with the reference module set.</p>
+<p>For application-specific builds, it may be more convenient to create several modules designed specifically to cooperate with each other.</p>
+<p>The Familiar core only provides orchestration and communication. The architecture above that layer belongs to the application.</p>
+<h2 id="summary">Summary</h2>
+<p>A Familiar module is fundamentally:</p>
+<pre><code class="language-text">standalone process
++
+JSON-RPC protocol
++
+optional custom methods
++
+optional LLM tools
++
+optional model access
+</code></pre>
+<p>The Go SDK provides a convenient implementation of this protocol, but it is not required.</p>
+<p>The main module coordinates the application and may communicate with helpers through <code>moduleRequest</code>.</p>
+<p>Helpers are independent components. They may provide RPC methods and tools, and may create isolated LLM requests with their own messages and capabilities.</p>
+<p>Familiar intentionally keeps the contract between these components small, leaving the internal design of each module up to its author.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.expand", "navigation.top", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,1884 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../roadmap/">
+      
+      
+        <link rel="next" href="../module_development/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/familiar.ico">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Application building - Familiar</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#building-an-application" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Familiar" class="md-header__button md-logo" aria-label="Familiar" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Familiar
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Application building
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Familiar" class="md-nav__button md-logo" aria-label="Familiar" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Familiar
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Application building
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Application building
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#application-layout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Application layout
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#main-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Main configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#directory-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Directory settings
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Directory settings">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#enginesdir" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        enginesDir
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modelsdir" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        modelsDir
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modulesdir" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        modulesDir
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#application-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Application settings
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Application settings">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#port" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        port
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verbose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        verbose
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starttimeout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        startTimeout
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#inference-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inference parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#engine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        engine
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        model
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#main-module" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Main module
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#helper-modules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Helper modules
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#inference-engines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inference engines
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Inference engines">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#engine-manifest-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Engine manifest fields
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Engine manifest fields">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#name" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        name
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#description" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        description
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exec" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        exec
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#apipaths" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        apiPaths
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#args" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        args
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#remote-inference-engines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Remote inference engines
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#modules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modules
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Modules">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#module-manifest-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Module manifest fields
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Module manifest fields">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#name_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        name
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#description_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        description
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exec_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        exec
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#args_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        args
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#module-working-directory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Module working directory
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#model-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Model files
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#building-an-application_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Building an application
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#module-compatibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Module compatibility
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#application-specific-modules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Application-specific modules
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#trust-and-security" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Trust and security
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#a-note-on-portability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A note on portability
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../module_development/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Module development
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../demos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Demo bundles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#application-layout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Application layout
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#main-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Main configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#directory-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Directory settings
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Directory settings">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#enginesdir" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        enginesDir
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modelsdir" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        modelsDir
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modulesdir" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        modulesDir
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#application-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Application settings
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Application settings">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#port" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        port
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verbose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        verbose
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starttimeout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        startTimeout
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#inference-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inference parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#engine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        engine
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        model
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#main-module" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Main module
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#helper-modules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Helper modules
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#inference-engines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inference engines
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Inference engines">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#engine-manifest-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Engine manifest fields
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Engine manifest fields">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#name" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        name
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#description" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        description
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exec" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        exec
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#apipaths" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        apiPaths
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#args" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        args
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#remote-inference-engines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Remote inference engines
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#modules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modules
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Modules">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#module-manifest-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Module manifest fields
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Module manifest fields">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#name_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        name
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#description_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        description
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exec_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        exec
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#args_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        args
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#module-working-directory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Module working directory
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#model-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Model files
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#building-an-application_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Building an application
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#module-compatibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Module compatibility
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#application-specific-modules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Application-specific modules
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#trust-and-security" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Trust and security
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#a-note-on-portability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A note on portability
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="building-an-application">Building an Application</h1>
+<p>A Familiar application is assembled from an inference engine, a main module, optional helper modules, model files, and a configuration file.</p>
+<p>There is intentionally very little packaging logic involved. Building an application mostly means placing the required components into directories and describing how they should be connected.</p>
+<p>Familiar does not attempt to verify whether modules are semantically compatible with each other. The person assembling the application is responsible for understanding what each module expects and what it provides.</p>
+<h2 id="application-layout">Application layout</h2>
+<p>A typical application directory may look like this:</p>
+<pre><code class="language-text">familiar/
+├── familiar
+├── configuration.json
+├── engines/
+│   └── ubuntu-vulkan-llama/
+│       ├── llama-server
+│       └── manifest.json
+├── models/
+│   └── Qwen3-1.7B-Q8_0.gguf
+└── modules/
+    ├── ui/
+    │   ├── familiar_ui
+    │   └── manifest.json
+    ├── history/
+    │   ├── history
+    │   └── manifest.json
+    ├── context/
+    │   ├── context
+    │   └── manifest.json
+    └── records/
+        ├── records
+        ├── manifest.json
+        └── schema.json
+</code></pre>
+<p>The exact contents depend on the application.</p>
+<p>A very small application may contain only a main module and an inference engine. Other applications may use several helper modules for history, context management, records, knowledge retrieval, or other tasks.</p>
+<h2 id="main-configuration">Main configuration</h2>
+<p>The application is configured through a JSON file.</p>
+<p>A relatively complete example looks like this:</p>
+<pre><code class="language-json">{
+    &quot;enginesDir&quot;: &quot;./engines&quot;,
+    &quot;modelsDir&quot;: &quot;./models&quot;,
+    &quot;modulesDir&quot;: &quot;./modules&quot;,
+
+    &quot;app&quot;: {
+        &quot;port&quot;: 14000,
+        &quot;verbose&quot;: true,
+        &quot;startTimeout&quot;: 60,
+        &quot;temperature&quot;: 0.1,
+        &quot;top_p&quot;: 0.8,
+        &quot;max_tokens&quot;: 512,
+
+        &quot;engine&quot;: &quot;ubuntu-vulkan-llama&quot;,
+        &quot;model&quot;: &quot;Qwen3-1.7B-Q8_0.gguf&quot;,
+
+        &quot;main&quot;: {
+            &quot;name&quot;: &quot;ui&quot;,
+            &quot;configuration&quot;: {
+                &quot;port&quot;: 8080,
+                &quot;history&quot;: &quot;short_history&quot;,
+                &quot;context&quot;: &quot;context&quot;
+            }
+        },
+
+        &quot;helpers&quot;: {
+            &quot;short_history&quot;: {
+                &quot;name&quot;: &quot;history&quot;,
+                &quot;configuration&quot;: {
+                    &quot;size&quot;: 20,
+                    &quot;store&quot;: true
+                }
+            },
+
+            &quot;context&quot;: {
+                &quot;name&quot;: &quot;context&quot;,
+                &quot;configuration&quot;: {
+                    &quot;store&quot;: true,
+                    &quot;useMemory&quot;: false
+                }
+            },
+
+            &quot;records&quot;: {
+                &quot;name&quot;: &quot;records&quot;,
+                &quot;configuration&quot;: {}
+            },
+
+            &quot;datetime&quot;: {
+                &quot;name&quot;: &quot;datetime&quot;,
+                &quot;configuration&quot;: {}
+            }
+        }
+    }
+}
+</code></pre>
+<h2 id="directory-settings">Directory settings</h2>
+<p>The top-level directory fields tell Familiar where to find application components.</p>
+<h3 id="enginesdir"><code>enginesDir</code></h3>
+<p>Directory containing inference engines.</p>
+<p>Each engine is stored in its own subdirectory together with a manifest describing how it should be launched.</p>
+<p>Example:</p>
+<pre><code class="language-text">engines/
+├── ubuntu-vulkan-llama/
+├── ubuntu-cpu-llama/
+└── openrouter/
+</code></pre>
+<h3 id="modelsdir"><code>modelsDir</code></h3>
+<p>Directory containing model files.</p>
+<p>Model files do not require manifests.</p>
+<p>For a <code>llama.cpp</code> based engine, this directory may contain GGUF files:</p>
+<pre><code class="language-text">models/
+├── Qwen3-1.7B-Q8_0.gguf
+└── another-model.gguf
+</code></pre>
+<p>Some inference engines do not use local model files at all. For example, an OpenRouter-backed engine may select its model through its own configuration.</p>
+<h3 id="modulesdir"><code>modulesDir</code></h3>
+<p>Directory containing application modules.</p>
+<p>Each module lives in its own directory and has a manifest describing how Familiar should start it.</p>
+<p>Example:</p>
+<pre><code class="language-text">modules/
+├── ui/
+├── history/
+├── context/
+├── records/
+└── datetime/
+</code></pre>
+<h2 id="application-settings">Application settings</h2>
+<p>The <code>app</code> object describes the current application build.</p>
+<h3 id="port"><code>port</code></h3>
+<pre><code class="language-json">&quot;port&quot;: 14000
+</code></pre>
+<p>Internal port assigned to the inference engine.</p>
+<p>Familiar starts the configured engine as a subprocess and passes this port to it.</p>
+<p>The engine is expected to expose its HTTP API on this port.</p>
+<h3 id="verbose"><code>verbose</code></h3>
+<pre><code class="language-json">&quot;verbose&quot;: true
+</code></pre>
+<p>Controls whether inference engine output is shown in the Familiar output.</p>
+<p>This is useful while developing or debugging an engine. It can be disabled when engine logs are not needed.</p>
+<h3 id="starttimeout"><code>startTimeout</code></h3>
+<pre><code class="language-json">&quot;startTimeout&quot;: 60
+</code></pre>
+<p>Maximum number of seconds Familiar waits for the inference engine to become ready.</p>
+<p>During startup, Familiar checks the engine's health endpoint.</p>
+<p>If the engine does not become available before the timeout expires, application startup fails.</p>
+<p>This is particularly relevant for local models, where loading weights may take some time.</p>
+<h3 id="inference-parameters">Inference parameters</h3>
+<p>The following fields are passed as inference parameters:</p>
+<pre><code class="language-json">&quot;temperature&quot;: 0.1,
+&quot;top_p&quot;: 0.8,
+&quot;max_tokens&quot;: 512
+</code></pre>
+<p>These correspond to the usual LLM inference settings.</p>
+<p>Their exact effect may depend on the selected inference engine and model.</p>
+<h3 id="engine"><code>engine</code></h3>
+<pre><code class="language-json">&quot;engine&quot;: &quot;ubuntu-vulkan-llama&quot;
+</code></pre>
+<p>Selects an engine from <code>enginesDir</code>.</p>
+<p>The value refers to the engine directory name.</p>
+<p>For example:</p>
+<pre><code class="language-text">engines/
+└── ubuntu-vulkan-llama/
+</code></pre>
+<p>is selected with:</p>
+<pre><code class="language-json">&quot;engine&quot;: &quot;ubuntu-vulkan-llama&quot;
+</code></pre>
+<h3 id="model"><code>model</code></h3>
+<pre><code class="language-json">&quot;model&quot;: &quot;Qwen3-1.7B-Q8_0.gguf&quot;
+</code></pre>
+<p>Selects a model file from <code>modelsDir</code>.</p>
+<p>This is mainly used by local inference engines such as <code>llama.cpp</code>.</p>
+<p>For an engine that manages model selection itself, such as an OpenRouter proxy, this field may be left empty:</p>
+<pre><code class="language-json">&quot;model&quot;: &quot;&quot;
+</code></pre>
+<p>The meaning of the field ultimately depends on the engine manifest and its arguments.</p>
+<h2 id="main-module">Main module</h2>
+<p>Every Familiar application has one main module.</p>
+<p>Example:</p>
+<pre><code class="language-json">&quot;main&quot;: {
+    &quot;name&quot;: &quot;ui&quot;,
+    &quot;configuration&quot;: {
+        &quot;port&quot;: 8080,
+        &quot;history&quot;: &quot;short_history&quot;,
+        &quot;context&quot;: &quot;context&quot;
+    }
+}
+</code></pre>
+<p>The <code>name</code> field selects a module from <code>modulesDir</code>.</p>
+<p>In this example:</p>
+<pre><code class="language-text">modules/
+└── ui/
+</code></pre>
+<p>is used as the main module.</p>
+<p>The <code>configuration</code> object is passed directly to the module during its <code>load</code> phase.</p>
+<p>Familiar itself does not interpret this configuration.</p>
+<p>Its structure is defined entirely by the module.</p>
+<p>For example, the UI module above happens to expect:</p>
+<pre><code class="language-json">{
+    &quot;port&quot;: 8080,
+    &quot;history&quot;: &quot;short_history&quot;,
+    &quot;context&quot;: &quot;context&quot;
+}
+</code></pre>
+<p>Another main module may expect completely different settings.</p>
+<p>The main module is usually responsible for the primary application workflow. It may expose a UI, an HTTP API, a CLI, or any other application entry point.</p>
+<h2 id="helper-modules">Helper modules</h2>
+<p>Additional modules are configured under <code>helpers</code>.</p>
+<p>Example:</p>
+<pre><code class="language-json">&quot;helpers&quot;: {
+    &quot;short_history&quot;: {
+        &quot;name&quot;: &quot;history&quot;,
+        &quot;configuration&quot;: {
+            &quot;size&quot;: 20,
+            &quot;store&quot;: true
+        }
+    },
+
+    &quot;records&quot;: {
+        &quot;name&quot;: &quot;records&quot;,
+        &quot;configuration&quot;: {}
+    }
+}
+</code></pre>
+<p>Each helper entry has two names with different purposes.</p>
+<p>In:</p>
+<pre><code class="language-json">&quot;short_history&quot;: {
+    &quot;name&quot;: &quot;history&quot;
+}
+</code></pre>
+<p><code>short_history</code> is the identifier used by this application.</p>
+<p><code>history</code> is the module directory that should be loaded from <code>modulesDir</code>.</p>
+<p>This allows the same module implementation to potentially be used more than once with different configurations.</p>
+<p>For example, an application could theoretically contain:</p>
+<pre><code class="language-json">&quot;helpers&quot;: {
+    &quot;short_history&quot;: {
+        &quot;name&quot;: &quot;history&quot;,
+        &quot;configuration&quot;: {
+            &quot;size&quot;: 20
+        }
+    },
+
+    &quot;long_history&quot;: {
+        &quot;name&quot;: &quot;history&quot;,
+        &quot;configuration&quot;: {
+            &quot;size&quot;: 200
+        }
+    }
+}
+</code></pre>
+<p>Whether such a configuration is useful depends on the modules involved.</p>
+<p>Like the main module configuration, helper <code>configuration</code> objects are passed directly to the corresponding module.</p>
+<p>Familiar does not interpret their contents.</p>
+<h2 id="inference-engines">Inference engines</h2>
+<p>An inference engine is a subprocess that exposes an OpenAI-compatible HTTP interface.</p>
+<p>At minimum, Familiar needs to know:</p>
+<ul>
+<li>how to start the engine;</li>
+<li>where its health endpoint is;</li>
+<li>where its chat completion endpoint is.</li>
+</ul>
+<p>Each engine lives in its own directory under <code>enginesDir</code>.</p>
+<p>Example:</p>
+<pre><code class="language-text">engines/
+└── ubuntu-vulkan-llama/
+    ├── llama-server
+    └── manifest.json
+</code></pre>
+<p>An engine manifest may look like this:</p>
+<pre><code class="language-json">{
+    &quot;name&quot;: &quot;llama.cpp CPU&quot;,
+    &quot;description&quot;: &quot;CPU version&quot;,
+    &quot;exec&quot;: &quot;llama-server&quot;,
+
+    &quot;apiPaths&quot;: {
+        &quot;health&quot;: &quot;/health&quot;,
+        &quot;request&quot;: &quot;/v1/chat/completions&quot;
+    },
+
+    &quot;args&quot;: [
+        &quot;-m&quot;,
+        &quot;%MODEL%&quot;,
+        &quot;--host&quot;,
+        &quot;127.0.0.1&quot;,
+        &quot;--port&quot;,
+        &quot;%PORT%&quot;,
+        &quot;--no-ui&quot;
+    ]
+}
+</code></pre>
+<h3 id="engine-manifest-fields">Engine manifest fields</h3>
+<h4 id="name"><code>name</code></h4>
+<p>Human-readable engine name.</p>
+<pre><code class="language-json">&quot;name&quot;: &quot;llama.cpp CPU&quot;
+</code></pre>
+<p>It is primarily descriptive.</p>
+<h4 id="description"><code>description</code></h4>
+<p>Optional human-readable description of the engine.</p>
+<pre><code class="language-json">&quot;description&quot;: &quot;CPU version&quot;
+</code></pre>
+<h4 id="exec"><code>exec</code></h4>
+<p>Executable that should be started.</p>
+<pre><code class="language-json">&quot;exec&quot;: &quot;llama-server&quot;
+</code></pre>
+<p>The executable is resolved relative to the engine directory.</p>
+<p>An engine does not have to be <code>llama.cpp</code>. It may be any program capable of exposing the expected HTTP endpoints.</p>
+<p>For example, an engine may also be a small proxy to a remote inference service.</p>
+<h4 id="apipaths"><code>apiPaths</code></h4>
+<p>Defines HTTP paths used by Familiar.</p>
+<pre><code class="language-json">&quot;apiPaths&quot;: {
+    &quot;health&quot;: &quot;/health&quot;,
+    &quot;request&quot;: &quot;/v1/chat/completions&quot;
+}
+</code></pre>
+<p><code>health</code> is used during startup to determine whether the engine is ready.</p>
+<p><code>request</code> is used for inference requests.</p>
+<h4 id="args"><code>args</code></h4>
+<p>Command-line arguments passed to the engine.</p>
+<pre><code class="language-json">&quot;args&quot;: [
+    &quot;-m&quot;,
+    &quot;%MODEL%&quot;,
+    &quot;--host&quot;,
+    &quot;127.0.0.1&quot;,
+    &quot;--port&quot;,
+    &quot;%PORT%&quot;,
+    &quot;--no-ui&quot;
+]
+</code></pre>
+<p>Familiar substitutes special placeholders before starting the process.</p>
+<p><code>%PORT%</code> is replaced with the application inference port.</p>
+<p><code>%MODEL%</code> is replaced with the selected model path.</p>
+<p>This makes it possible to describe different engine launch commands without adding engine-specific behavior to the Familiar core.</p>
+<h2 id="remote-inference-engines">Remote inference engines</h2>
+<p>An inference engine does not need to perform inference locally.</p>
+<p>For example, an engine can be a small proxy that listens on the local port expected by Familiar and forwards requests to OpenRouter or another remote API.</p>
+<p>From the core runtime's perspective, both cases look similar:</p>
+<pre><code class="language-text">Familiar
+    |
+    v
+Local inference engine
+    |
+    v
+Local model
+</code></pre>
+<p>or:</p>
+<pre><code class="language-text">Familiar
+    |
+    v
+Local proxy engine
+    |
+    v
+Remote LLM provider
+</code></pre>
+<p>This allows the rest of the application to remain unchanged when switching inference backends.</p>
+<p>Local modules such as history, records, and knowledge storage may still remain local even when inference itself is remote.</p>
+<h2 id="modules">Modules</h2>
+<p>A module is a standalone subprocess.</p>
+<p>Each module lives in its own directory under <code>modulesDir</code>.</p>
+<p>Example:</p>
+<pre><code class="language-text">modules/
+└── ui/
+    ├── familiar_ui
+    └── manifest.json
+</code></pre>
+<p>A module manifest may look like this:</p>
+<pre><code class="language-json">{
+    &quot;name&quot;: &quot;ui&quot;,
+    &quot;description&quot;: &quot;Simple ui&quot;,
+    &quot;exec&quot;: &quot;./familiar_ui&quot;,
+    &quot;args&quot;: []
+}
+</code></pre>
+<h3 id="module-manifest-fields">Module manifest fields</h3>
+<h4 id="name_1"><code>name</code></h4>
+<p>Human-readable module name.</p>
+<pre><code class="language-json">&quot;name&quot;: &quot;ui&quot;
+</code></pre>
+<h4 id="description_1"><code>description</code></h4>
+<p>Optional description of the module.</p>
+<pre><code class="language-json">&quot;description&quot;: &quot;Simple ui&quot;
+</code></pre>
+<h4 id="exec_1"><code>exec</code></h4>
+<p>Program that should be started.</p>
+<pre><code class="language-json">&quot;exec&quot;: &quot;./familiar_ui&quot;
+</code></pre>
+<p>This may be a native executable, but it does not need to be one.</p>
+<p>For example, a Python module could be launched through a bundled virtual environment.</p>
+<p>Conceptually:</p>
+<pre><code class="language-json">{
+    &quot;exec&quot;: &quot;./venv/bin/python&quot;,
+    &quot;args&quot;: [
+        &quot;my_module.py&quot;
+    ]
+}
+</code></pre>
+<p>A module may therefore be implemented in any language or runtime that can communicate using the Familiar module protocol.</p>
+<h4 id="args_1"><code>args</code></h4>
+<p>Additional command-line arguments passed to the module.</p>
+<pre><code class="language-json">&quot;args&quot;: []
+</code></pre>
+<p>Arguments are passed in the order specified by the manifest.</p>
+<h2 id="module-working-directory">Module working directory</h2>
+<p>A module is started with its own module directory as the current working directory.</p>
+<p>For example:</p>
+<pre><code class="language-text">modules/
+└── history/
+    ├── history
+    ├── manifest.json
+    └── dump.json
+</code></pre>
+<p>When the <code>history</code> module is running, its working directory is:</p>
+<pre><code class="language-text">modules/history/
+</code></pre>
+<p>This is intentional.</p>
+<p>It allows a small module to keep its own files next to its executable without requiring additional path configuration.</p>
+<p>A module may therefore use simple relative paths such as:</p>
+<pre><code class="language-text">dump.json
+schema.json
+docs/
+cache/
+configuration.json
+</code></pre>
+<p>This also makes modules easier to move together with their data.</p>
+<p>For example, copying a module directory may copy both the module implementation and its persistent local state.</p>
+<p>The exact storage strategy remains up to the module.</p>
+<h2 id="model-files">Model files</h2>
+<p>Model weights are simpler than engines and modules.</p>
+<p>They are placed directly under <code>modelsDir</code> and do not require manifests.</p>
+<p>Example:</p>
+<pre><code class="language-text">models/
+├── Qwen3-1.7B-Q8_0.gguf
+├── Qwen3-4B-Q5_K_M.gguf
+└── tiny-test-model.gguf
+</code></pre>
+<p>The configured engine determines how the model file is used.</p>
+<p>For a <code>llama.cpp</code> engine, the selected path may be substituted into <code>%MODEL%</code>.</p>
+<p>For an engine that does not use local weights, the model configuration may be ignored or left empty.</p>
+<h2 id="building-an-application_1">Building an application</h2>
+<p>There is no dedicated package format required for a Familiar application.</p>
+<p>A basic build process is:</p>
+<ol>
+<li>Create directories for engines, models, and modules.</li>
+<li>Place the required inference engine into <code>enginesDir</code>.</li>
+<li>Add an engine manifest.</li>
+<li>Place any required model weights into <code>modelsDir</code>.</li>
+<li>Place the main module and helper modules into <code>modulesDir</code>.</li>
+<li>Add a manifest for each module.</li>
+<li>Create the main Familiar configuration.</li>
+<li>Start Familiar.</li>
+</ol>
+<p>For example:</p>
+<pre><code class="language-text">my-app/
+├── familiar
+├── configuration.json
+├── engines/
+├── models/
+└── modules/
+</code></pre>
+<p>The application configuration then connects these components together.</p>
+<h2 id="module-compatibility">Module compatibility</h2>
+<p>Familiar intentionally performs only limited orchestration.</p>
+<p>It does not attempt to determine whether two modules are logically compatible.</p>
+<p>For example, a UI module may expect helper modules named:</p>
+<pre><code class="language-text">history
+context
+</code></pre>
+<p>while another main module may expect completely different RPC methods or helper names.</p>
+<p>It is therefore the responsibility of the application author to know:</p>
+<ul>
+<li>which RPC methods a module exposes;</li>
+<li>which helper modules it expects;</li>
+<li>which tools it provides;</li>
+<li>what configuration format it accepts;</li>
+<li>what persistent files it requires;</li>
+<li>whether it expects another module with a particular behavior.</li>
+</ul>
+<p>The reference modules included with Familiar are examples and reusable building blocks, not a universal compatibility standard.</p>
+<p>It is completely valid to build a different set of modules that cooperate with each other but are not compatible with the reference modules.</p>
+<h2 id="application-specific-modules">Application-specific modules</h2>
+<p>A Familiar build does not need to use generic modules.</p>
+<p>For a particular application, it may be simpler to write several modules specifically designed to work together.</p>
+<p>For example:</p>
+<pre><code class="language-text">modules/
+├── customer_api/
+├── customer_memory/
+├── report_generator/
+└── company_database/
+</code></pre>
+<p>These modules may use their own conventions and internal RPC methods.</p>
+<p>Familiar only provides the process orchestration and common protocol mechanisms.</p>
+<p>The architecture inside the application remains intentionally flexible.</p>
+<h2 id="trust-and-security">Trust and security</h2>
+<p>Modules are ordinary subprocesses.</p>
+<p>They run with the same operating-system permissions as the user running Familiar.</p>
+<p>A module can therefore potentially:</p>
+<ul>
+<li>read and write accessible files;</li>
+<li>access the network;</li>
+<li>start other processes;</li>
+<li>modify its own files;</li>
+<li>interact with other system resources available to the user.</li>
+</ul>
+<p>Familiar does not sandbox modules or attempt to restrict their behavior.</p>
+<p>For this reason, modules and prebuilt Familiar distributions should only be used from sources you trust.</p>
+<p>The same applies to inference engines: they are also executable programs launched by Familiar.</p>
+<p>This trust model is intentional and keeps the runtime relatively small, but it means Familiar should not be treated as a secure environment for executing untrusted plugins.</p>
+<h2 id="a-note-on-portability">A note on portability</h2>
+<p>Because engines and modules are external processes, application bundles may need platform-specific executables.</p>
+<p>For example, a build intended for Linux and Windows may contain different engine binaries and module binaries for each operating system.</p>
+<p>The module protocol itself is not tied to a particular language or runtime, but the programs implementing it must of course be executable on the target system.</p>
+<p>This is one reason engine and module directories are kept separate from the Familiar core: different application distributions can package whatever implementations are appropriate for their target environment.</p>
+<h2 id="summary">Summary</h2>
+<p>A Familiar application is mostly a directory structure plus configuration:</p>
+<pre><code class="language-text">configuration
++
+main module
++
+optional helper modules
++
+inference engine
++
+optional local model
+</code></pre>
+<p>The core runtime connects these pieces but does not prescribe what the application should look like internally.</p>
+<p>This makes it possible to build very small applications with only a few components, or experimental applications composed from several specialized modules, without requiring every build to adopt the same architecture.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.expand", "navigation.top", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

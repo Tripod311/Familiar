@@ -179,97 +179,9 @@ func (app *Application) ProcessMainEvent(event *sdk.Event) {
 
 	switch packet.Method {
 	case "modelRequest":
-		tools := make([]sdk.Tool, 0)
-
-		for _, desc := range app.Main.Tools {
-			tools = append(tools, sdk.Tool{
-				Type:     "function",
-				Function: desc,
-				Call:     app.Main.CallFunction,
-			})
-		}
-
-		for _, module := range app.Helpers {
-			for _, desc := range module.Tools {
-				tools = append(tools, sdk.Tool{
-					Type:     "function",
-					Function: desc,
-					Call:     module.CallFunction,
-				})
-			}
-		}
-
-		var messages []sdk.Message
-
-		err := json.Unmarshal(packet.Params, &messages)
-		if err != nil {
-			app.Main.Respond(packet.ID, nil, &sdk.RPCError{
-				Code:    1,
-				Message: fmt.Sprintf("Packet reading error: %s", err),
-			})
-			return
-		}
-
-		req := sdk.ServerRequest{
-			Tools:    tools,
-			Messages: messages,
-		}
-
-		res, err := app.Model.Request(&req)
-		if err != nil {
-			app.Main.Respond(packet.ID, nil, &sdk.RPCError{
-				Code:    1,
-				Message: fmt.Sprintf("Packet processing error: %s", err),
-			})
-			return
-		}
-
-		bytes, err := json.Marshal(res)
-		if err != nil {
-			app.Main.Respond(packet.ID, nil, &sdk.RPCError{
-				Code:    1,
-				Message: fmt.Sprintf("Packet response error: %s", err),
-			})
-			return
-		}
-
-		err = app.Main.Respond(packet.ID, bytes, nil)
-		if err != nil {
-			fmt.Printf("Error on response: %s", err)
-		}
+		app.modelRequestMain(&packet)
 	case "moduleRequest":
-		var moduleRequest sdk.ModuleRequest
-
-		err := json.Unmarshal(packet.Params, &moduleRequest)
-		if err != nil {
-			app.Main.Respond(packet.ID, nil, &sdk.RPCError{
-				Code:    1,
-				Message: fmt.Sprintf("Invalid module request: %s", err),
-			})
-			return
-		}
-
-		helper, exists := app.Helpers[moduleRequest.Module]
-		if !exists {
-			app.Main.Respond(packet.ID, nil, &sdk.RPCError{
-				Code:    1,
-				Message: fmt.Sprintf("Module not found: %s", moduleRequest.Module),
-			})
-			return
-		}
-
-		res, err := helper.Send(moduleRequest.Method, moduleRequest.Params)
-		if err != nil {
-			app.Main.Respond(packet.ID, nil, &sdk.RPCError{
-				Code:    1,
-				Message: fmt.Sprintf("Module returned error: %s", err),
-			})
-			return
-		} else if res.Error != nil {
-			app.Main.Respond(packet.ID, nil, res.Error)
-		} else {
-			app.Main.Respond(packet.ID, res.Result, nil)
-		}
+		app.moduleRequest(app.Main, &packet)
 	default:
 		app.Main.Respond(packet.ID, nil, &sdk.RPCError{
 			Code:    1,
@@ -283,11 +195,7 @@ func (app *Application) ProcessHelperEvent(module *Module, event *sdk.Event) {
 
 	switch packet.Method {
 	case "modelRequest":
-		var req sdk.ServerRequest
-
-		err := json.Unmarshal(packet.Params, &req)
-
-		res, err := app.Model.Request(&req)
+		res, err := app.modelRequestHelper(module, &packet)
 		if err != nil {
 			module.Respond(packet.ID, nil, &sdk.RPCError{
 				Code:    1,
@@ -296,19 +204,10 @@ func (app *Application) ProcessHelperEvent(module *Module, event *sdk.Event) {
 			return
 		}
 
-		bytes, err := json.Marshal(res)
-		if err != nil {
-			module.Respond(packet.ID, nil, &sdk.RPCError{
-				Code:    1,
-				Message: fmt.Sprintf("Packet response error: %s", err),
-			})
-			return
-		}
-
-		err = module.Respond(packet.ID, bytes, nil)
-		if err != nil {
+		if err := module.Respond(packet.ID, res, nil); err != nil {
 			fmt.Printf("Error on response: %s", err)
 		}
+
 	default:
 		module.Respond(packet.ID, nil, &sdk.RPCError{
 			Code:    1,
@@ -337,4 +236,136 @@ func (app *Application) ProcessModuleClosed(event *sdk.Event) {
 	)
 
 	app.Stop()
+}
+
+func (app *Application) modelRequestMain(packet *sdk.RPCPacket) {
+	tools := make([]sdk.Tool, 0)
+
+	for _, desc := range app.Main.Tools {
+		tools = append(tools, sdk.Tool{
+			Type:     "function",
+			Function: desc,
+			Call:     app.Main.CallFunction,
+		})
+	}
+
+	for _, module := range app.Helpers {
+		for _, desc := range module.Tools {
+			tools = append(tools, sdk.Tool{
+				Type:     "function",
+				Function: desc,
+				Call:     module.CallFunction,
+			})
+		}
+	}
+
+	var messages []sdk.Message
+
+	err := json.Unmarshal(packet.Params, &messages)
+	if err != nil {
+		app.Main.Respond(packet.ID, nil, &sdk.RPCError{
+			Code:    1,
+			Message: fmt.Sprintf("Packet reading error: %s", err),
+		})
+		return
+	}
+
+	req := sdk.ServerRequest{
+		Tools:    tools,
+		Messages: messages,
+	}
+
+	res, err := app.Model.Request(&req)
+	if err != nil {
+		app.Main.Respond(packet.ID, nil, &sdk.RPCError{
+			Code:    1,
+			Message: fmt.Sprintf("Packet processing error: %s", err),
+		})
+		return
+	}
+
+	bytes, err := json.Marshal(res)
+	if err != nil {
+		app.Main.Respond(packet.ID, nil, &sdk.RPCError{
+			Code:    1,
+			Message: fmt.Sprintf("Packet response error: %s", err),
+		})
+		return
+	}
+
+	err = app.Main.Respond(packet.ID, bytes, nil)
+	if err != nil {
+		fmt.Printf("Error on response: %s", err)
+	}
+}
+
+func (app *Application) modelRequestHelper(
+	invoker *Module,
+	packet *sdk.RPCPacket,
+) (json.RawMessage, error) {
+	var req sdk.ServerRequest
+
+	if err := json.Unmarshal(packet.Params, &req); err != nil {
+		return nil, fmt.Errorf(
+			"helper model request deserialization error: %w",
+			err,
+		)
+	}
+
+	for i := range req.Tools {
+		req.Tools[i].Call = invoker.CallFunction
+	}
+
+	res, err := app.Model.Request(&req)
+	if err != nil {
+		return nil, fmt.Errorf(
+			"helper model request failed: %w",
+			err,
+		)
+	}
+
+	bytes, err := json.Marshal(res)
+	if err != nil {
+		return nil, fmt.Errorf(
+			"helper model response serialization error: %w",
+			err,
+		)
+	}
+
+	return bytes, nil
+}
+
+func (app *Application) moduleRequest(invoker *Module, packet *sdk.RPCPacket) {
+	var moduleRequest sdk.ModuleRequest
+
+	err := json.Unmarshal(packet.Params, &moduleRequest)
+	if err != nil {
+		invoker.Respond(packet.ID, nil, &sdk.RPCError{
+			Code:    1,
+			Message: fmt.Sprintf("Invalid module request: %s", err),
+		})
+		return
+	}
+
+	helper, exists := app.Helpers[moduleRequest.Module]
+	if !exists {
+		invoker.Respond(packet.ID, nil, &sdk.RPCError{
+			Code:    1,
+			Message: fmt.Sprintf("Module not found: %s", moduleRequest.Module),
+		})
+		return
+	}
+
+	res, err := helper.Send(moduleRequest.Method, moduleRequest.Params)
+	if err != nil {
+		invoker.Respond(packet.ID, nil, &sdk.RPCError{
+			Code:    1,
+			Message: fmt.Sprintf("Module returned error: %s", err),
+		})
+		return
+	} else if res.Error != nil {
+		invoker.Respond(packet.ID, nil, res.Error)
+	} else {
+		invoker.Respond(packet.ID, res.Result, nil)
+	}
 }

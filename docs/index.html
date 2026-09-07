@@ -1,0 +1,802 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+      
+        <link rel="next" href="roadmap/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="assets/familiar.ico">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Familiar</title>
+      
+    
+    
+      <link rel="stylesheet" href="assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#familiar" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="." title="Familiar" class="md-header__button md-logo" aria-label="Familiar" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Familiar
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Overview
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="." title="Familiar" class="md-nav__button md-logo" aria-label="Familiar" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Familiar
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="." class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#design-goals" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Design goals
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#modules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modules
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#main-and-helper-modules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Main and helper modules
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#inference-engines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inference engines
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reference-modules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reference modules
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#process-based-composition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Process-based composition
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#trust-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Trust model
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-familiar-is-not" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What Familiar is not
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="application_building/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Application building
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="module_development/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Module development
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="demos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Demo bundles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#design-goals" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Design goals
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#modules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modules
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#main-and-helper-modules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Main and helper modules
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#inference-engines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inference engines
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reference-modules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reference modules
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#process-based-composition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Process-based composition
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#trust-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Trust model
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-familiar-is-not" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What Familiar is not
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<p align="center">
+  <img src="../assets/familiar.png" width="160">
+</p>
+
+<h1 id="familiar">Familiar</h1>
+<p>Familiar is a lightweight runtime for building LLM-powered applications from independent modules.</p>
+<p>Instead of providing a large agent framework with a predefined architecture, Familiar focuses on a small orchestration layer. Applications are assembled from standalone processes that communicate through a simple RPC protocol.</p>
+<p>A module may provide a user interface, history storage, context management, persistent records, knowledge retrieval, system utilities, or any other functionality required by the application.</p>
+<p>The inference backend is also replaceable. A Familiar application may use a local model server, a remote OpenAI-compatible API, or a custom inference adapter.</p>
+<h2 id="design-goals">Design goals</h2>
+<p>Familiar is designed around a few simple principles:</p>
+<ul>
+<li>Keep the core runtime small.</li>
+<li>Keep application components independent.</li>
+<li>Do not prescribe how modules should be implemented internally.</li>
+<li>Allow modules to be written in any language.</li>
+<li>Allow each application to use only the components it actually needs.</li>
+<li>Keep persistent application data local when possible.</li>
+<li>Make experimental LLM applications quick to assemble and modify.</li>
+</ul>
+<p>Familiar is primarily intended as a flexible environment for experimentation and personal applications rather than as a production application framework.</p>
+<h2 id="architecture">Architecture</h2>
+<p>A Familiar application consists of:</p>
+<ul>
+<li>one <strong>main module</strong>;</li>
+<li>one <strong>inference engine</strong>;</li>
+<li>zero or more <strong>helper modules</strong>.</li>
+</ul>
+<p>The main module is responsible for the primary application workflow.</p>
+<p>Helper modules provide additional capabilities. They may expose tools to the LLM, provide services directly to the main module, or use the inference engine themselves for isolated LLM tasks.</p>
+<p>The exact structure is application-specific.</p>
+<p>Familiar does not require applications to use history, context management, a UI, a knowledge base, or any other particular component.</p>
+<h2 id="modules">Modules</h2>
+<p>Modules are standalone processes launched by Familiar.</p>
+<p>Communication between Familiar and a module happens through JSON RPC messages over the module's standard input and output streams.</p>
+<p>Because modules communicate through a process boundary rather than through a language-specific API, their implementation language is not important.</p>
+<p>For example, a module may be:</p>
+<ul>
+<li>a Go executable;</li>
+<li>a Python application running inside its own virtual environment;</li>
+<li>a Node.js program;</li>
+<li>a Rust or C++ binary;</li>
+<li>a proxy to an external HTTP service;</li>
+<li>an adapter around an existing command-line application.</li>
+</ul>
+<p>As long as the process implements the Familiar module protocol, the core runtime does not need to know how it works internally.</p>
+<h2 id="main-and-helper-modules">Main and helper modules</h2>
+<p>The main module is the central application component.</p>
+<p>It may:</p>
+<ul>
+<li>communicate with the user or an external API;</li>
+<li>send requests to the inference engine;</li>
+<li>call helper modules;</li>
+<li>expose its own tools to the LLM;</li>
+<li>combine results from multiple components.</li>
+</ul>
+<p>Helper modules are optional components that provide additional functionality.</p>
+<p>A helper may expose LLM tools, such as:</p>
+<pre><code class="language-text">records_search
+records_create
+system_datetime
+knowledge_search
+</code></pre>
+<p>A helper may also expose regular RPC methods intended for use by the main module.</p>
+<p>Some helpers can make their own requests to the inference engine. These requests are isolated from the main agent and may use their own prompts and tools.</p>
+<p>This allows a helper to act as a small specialized agent without gaining access to the main application's complete state or tool set.</p>
+<h2 id="inference-engines">Inference engines</h2>
+<p>Inference is separated from the rest of the application.</p>
+<p>The Familiar core communicates with an inference engine through an OpenAI-compatible chat completions interface.</p>
+<p>This makes it possible to switch between different backends without changing application modules.</p>
+<p>Examples include:</p>
+<ul>
+<li>a local <code>llama-server</code>;</li>
+<li>a local OpenAI-compatible model server;</li>
+<li>an OpenRouter proxy;</li>
+<li>another remote OpenAI-compatible provider;</li>
+<li>a custom inference adapter.</li>
+</ul>
+<p>Application state and inference do not need to live in the same place.</p>
+<p>For example, history, structured records, and knowledge files may remain on the local machine while only the context required for a specific request is sent to a remote model.</p>
+<h2 id="reference-modules">Reference modules</h2>
+<p>The Familiar repository includes a set of small modules intended primarily as examples and reusable building blocks.</p>
+<p>Examples include:</p>
+<ul>
+<li>simple chat UI;</li>
+<li>conversation history;</li>
+<li>context management;</li>
+<li>knowledge storage and retrieval;</li>
+<li>structured records;</li>
+<li>date and time utilities.</li>
+</ul>
+<p>These modules are not part of a mandatory application architecture.</p>
+<p>They are deliberately small and may be replaced, modified, combined differently, or ignored entirely.</p>
+<p>An application that only needs to expose an HTTP endpoint and generate LLM responses does not need to load history, context, UI, or knowledge modules at all.</p>
+<h2 id="process-based-composition">Process-based composition</h2>
+<p>Familiar treats a module as a complete program rather than as a library loaded into the main process.</p>
+<p>This approach has several useful properties:</p>
+<ul>
+<li>modules may use different languages and dependency ecosystems;</li>
+<li>modules can use completely different internal architectures;</li>
+<li>functionality can often be added without modifying the core runtime;</li>
+<li>dependencies remain isolated between components;</li>
+<li>existing programs and network services can be wrapped as Familiar modules.</li>
+</ul>
+<p>The tradeoff is that modules communicate through RPC rather than direct function calls, and debugging multiple processes may require more effort than debugging a monolithic application.</p>
+<p>For LLM applications, IPC overhead is generally insignificant compared with model inference and network latency.</p>
+<h2 id="trust-model">Trust model</h2>
+<p>Familiar does not sandbox modules.</p>
+<p>A module is an ordinary process and runs with the permissions of the user who started Familiar.</p>
+<p>Therefore, loading a module is equivalent to running any other executable on the system.</p>
+<p>Only use modules and prebuilt Familiar distributions from sources you trust.</p>
+<p>The Familiar runtime does not attempt to validate or restrict what third-party modules may do.</p>
+<h2 id="what-familiar-is-not">What Familiar is not</h2>
+<p>Familiar is not intended to provide:</p>
+<ul>
+<li>a universal agent architecture;</li>
+<li>a secure plugin sandbox;</li>
+<li>a production workflow engine;</li>
+<li>a distributed execution platform;</li>
+<li>a complete memory or RAG framework;</li>
+<li>a mandatory abstraction for every LLM application.</li>
+</ul>
+<p>Its purpose is smaller:</p>
+<blockquote>
+<p>Provide a lightweight runtime and protocol for composing LLM applications from independent processes.</p>
+</blockquote>
+<p>The rest of the architecture belongs to the application.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.sections", "navigation.expand", "navigation.top", "content.code.copy"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
