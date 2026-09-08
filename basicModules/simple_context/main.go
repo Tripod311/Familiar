@@ -189,11 +189,25 @@ func CallFunction(name string, arguments string) (json.RawMessage, error) {
 			return nil, fmt.Errorf("useMemory set to false")
 		}
 
-		fmt.Fprintf(os.Stderr, "MEMORY UPDATE: %s", arguments)
-		memoryState = []byte(arguments)
+		if !json.Valid([]byte(arguments)) {
+			return nil, fmt.Errorf("invalid memory state")
+		}
+
+		fmt.Fprintf(
+			os.Stderr,
+			"MEMORY UPDATE: %s\n",
+			arguments,
+		)
+
+		memoryState = json.RawMessage(arguments)
+
+		if config.Store {
+			Dump()
+		}
 
 		return nil, nil
+
 	default:
-		return nil, fmt.Errorf("Unknown function: %s", name)
+		return nil, fmt.Errorf("unknown function: %s", name)
 	}
 }

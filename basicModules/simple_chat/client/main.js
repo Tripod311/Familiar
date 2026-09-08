@@ -16,6 +16,47 @@ function addMessage(role, content) {
     return element;
 }
 
+async function loadHistory() {
+    LOCKED = true;
+
+    const placeholder = addMessage("thinking", "Loading history...");
+
+    try {
+        const response = await fetch("/history");
+
+        placeholder.remove();
+
+        if (!response.ok) {
+            const errorText = await response.text();
+
+            throw new Error(
+                `${response.status} ${response.statusText}` +
+                (errorText ? `\n${errorText}` : "")
+            );
+        }
+
+        const history = await response.json();
+
+        if (history) {
+            for (const message of history) {
+                addMessage(
+                    message.role,
+                    message.content
+                );
+            }
+        }
+    } catch (err) {
+        placeholder.remove();
+
+        addMessage(
+            "error",
+            `Failed to load history: ${err}`
+        );
+    } finally {
+        LOCKED = false;
+    }
+}
+
 async function sendMessage(message) {
     LOCKED = true;
 
@@ -39,7 +80,8 @@ async function sendMessage(message) {
             const errorText = await response.text();
 
             throw new Error(
-                `${response.status} ${response.statusText}\n` + (errorText ? `\n${errorText}` : "")
+                `${response.status} ${response.statusText}` +
+                (errorText ? `\n${errorText}` : "")
             );
         }
 
@@ -83,3 +125,5 @@ input.addEventListener("keydown", event => {
         form.requestSubmit();
     }
 });
+
+document.addEventListener("DOMContentLoaded", loadHistory);

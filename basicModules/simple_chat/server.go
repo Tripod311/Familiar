@@ -12,6 +12,7 @@ import (
 	"os"
 	"path"
 	"time"
+	sdk "tripod311/familiar-sdk"
 )
 
 //go:embed client
@@ -51,10 +52,16 @@ type Server struct {
 	cancel    context.CancelFunc
 	instance  *http.Server
 
-	sendRequest func(string) (string, error)
+	sendRequest  func(string) (string, error)
+	fetchHistory func() ([]sdk.Message, error)
 }
 
-func NewServer(port int, clientDir string, sendRequest func(string) (string, error)) *Server {
+func NewServer(
+	port int,
+	clientDir string,
+	sendRequest func(string) (string, error),
+	fetchHistory func() ([]sdk.Message, error),
+) *Server {
 	var result Server
 
 	result.Port = port
@@ -72,6 +79,7 @@ func NewServer(port int, clientDir string, sendRequest func(string) (string, err
 		}
 	}
 	result.sendRequest = sendRequest
+	result.fetchHistory = fetchHistory
 
 	return &result
 }
@@ -80,6 +88,7 @@ func (server *Server) Start() error {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/request", server.HandleRequest)
+	mux.HandleFunc("/history", server.FetchHistory)
 	mux.HandleFunc("/", server.statics.Serve)
 
 	addr := fmt.Sprintf("0.0.0.0:%d", server.Port)
@@ -170,4 +179,26 @@ func (server *Server) HandleRequest(w http.ResponseWriter, r *http.Request) {
 	}); err != nil {
 		fmt.Fprintln(os.Stderr, "response encode error:", err)
 	}
+}
+
+func (server *Server) FetchHistory(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	res, err := server.fetchHistory()
+	if err != nil {
+		http.Error(
+			w,
+			err.Error(),
+			http.StatusInternalServerError,
+		)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	json.NewEncoder(w).Encode(res)
 }

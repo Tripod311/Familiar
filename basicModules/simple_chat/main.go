@@ -44,7 +44,7 @@ func Setup(params json.RawMessage) (json.RawMessage, error) {
 		return nil, fmt.Errorf("Server config error: %s", err)
 	}
 
-	server = NewServer(config.Port, config.ClientDir, SendRequest)
+	server = NewServer(config.Port, config.ClientDir, SendRequest, FetchHistory)
 
 	if err := server.Start(); err != nil {
 		return nil, fmt.Errorf("Server start error: %s", err)

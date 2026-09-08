@@ -47,7 +47,7 @@ type ServerRequest struct {
 	Messages    []Message `json:"messages"`
 	Temperature *float64  `json:"temperature,omitempty"`
 	TopP        *float64  `json:"top_p,omitempty"`
-	MaxTokens   uint      `json:"max_tokens,omitempty"`
+	MaxTokens   *uint     `json:"max_tokens,omitempty"`
 }
 
 type ServerResponse struct {
