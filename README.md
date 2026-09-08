@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/assets/familiar.png" alt="Familiar" width="180">
+</p>
+
 # Familiar
 
 Familiar is a lightweight runtime for building LLM-powered applications from independent modules.
@@ -10,4 +14,5 @@ Inference is also replaceable. Familiar can work with local OpenAI-compatible se
 
 The project is experimental and primarily intended for local applications, prototyping, and experimentation with modular LLM architectures.
 
+[Demos](https://tripod311.github.io/Familiar/demos/)
 [Documentation](https://tripod311.github.io/Familiar/)

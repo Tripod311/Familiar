@@ -5,10 +5,10 @@ site_dir: ../docs
 
 nav:
   - Overview: index.md
+  - Demos: demos.md
   - Roadmap: roadmap.md
   - Application building: application_building.md
   - Module development: module_development.md
-  - Demo bundles: demos.md
 
 theme:
   name: material
